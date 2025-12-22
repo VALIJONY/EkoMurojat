@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bosh Sahifa | EkoMurojaat</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Leaflet CSS (Xarita uchun) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --secondary: #43a047;
+            --accent: #00e676;
+            --bg-light: #f1f8e9;
+            --text-dark: #1a202c;
+            --text-gray: #718096;
+            --white: #ffffff;
+            --glass: rgba(255, 255, 255, 0.9);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            padding-top: 80px;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 80px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5%;
+            z-index: 1000;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        }
+
+        .brand {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .btn-outline { border: 2px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: var(--bg-light); }
+
+        .btn-fill {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: white;
+            box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
+        }
+        .btn-fill:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(46, 125, 50, 0.4); }
+
+        /* HERO & FILTER */
+        .hero-section {
+            background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);
+            padding: 60px 20px 100px 20px; /* Map ustiga chiqishi uchun padding ko'paytirildi */
+            color: white;
+            text-align: center;
+            border-radius: 0 0 50% 50% / 40px;
+            margin-bottom: 20px;
+        }
+
+        .hero-title { font-size: 2.5rem; margin-bottom: 20px; font-weight: 800; }
+
+        .filter-box {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            display: inline-flex;
+            gap: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 900px;
+            position: relative;
+            z-index: 10;
+        }
+
+        select, button[type="submit"] {
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            font-size: 1rem;
+            outline: none;
+            font-family: 'Nunito', sans-serif;
+        }
+        select { min-width: 200px; cursor: pointer; color: var(--text-dark); }
+        button[type="submit"] { background: var(--primary); color: white; border: none; cursor: pointer; font-weight: 700; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px 60px; }
+
+        /* MAP SECTION */
+        .map-wrapper {
+            margin-top: -60px; /* Heroning ichiga kirib turishi uchun */
+            margin-bottom: 50px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 4px solid white;
+            position: relative;
+            z-index: 1;
+        }
+
+        #uzbMap {
+            height: 550px;
+            width: 100%;
+            background: #eef2f3;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 25px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title::before { content: ''; width: 5px; height: 25px; background: var(--accent); border-radius: 10px; display: block; }
+
+        /* Complaints List Styles (Oldingidek) */
+        .top-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
+        .complaint-card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: transform 0.3s; border-left: 5px solid #e74c3c; }
+        .complaint-card:hover { transform: translateY(-5px); }
+        .card-header { display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .card-title { font-weight: 700; font-size: 1.1rem; }
+        .priority-badge { background: #ffebee; color: #c62828; padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; }
+        .card-location { color: var(--text-gray); font-size: 0.9rem; margin-bottom: 15px; display: flex; align-items: center; gap: 5px; }
+        .card-footer { display: flex; justify-content: space-between; border-top: 1px solid #f0f0f0; padding-top: 15px; font-size: 0.85rem; }
+        .status-badge { padding: 5px 10px; border-radius: 20px; font-weight: 700; font-size: 0.8rem; }
+        .status-new { background: #e3f2fd; color: #1976d2; }
+        .status-progress { background: #fff3e0; color: #f57c00; }
+        .status-closed { background: #e8f5e9; color: #2e7d32; }
+
+        /* Custom Popup Style */
+        .leaflet-popup-content-wrapper { border-radius: 12px; padding: 0; overflow: hidden; }
+        .leaflet-popup-content { margin: 0; width: 280px !important; }
+        .popup-header { background: var(--primary); color: white; padding: 10px 15px; font-weight: bold; font-size: 0.95rem; }
+        .popup-body { padding: 15px; }
+        .popup-status { display: inline-block; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; margin-top: 5px; background: #eee; }
+
+        @media (max-width: 768px) {
+            .filter-box { flex-direction: column; width: 100%; }
+            select, button { width: 100%; }
+            #uzbMap { height: 400px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <a href="/" class="brand">
+            <i class="fas fa-leaf"></i> EkoMurojaat
+        </a>
+        <div class="nav-buttons">
+            {% if user.is_authenticated %}
+                <a href="{% url 'user_complaint_create' %}" class="btn btn-fill"><i class="fas fa-plus"></i> Yangi</a>
+                <a href="{% url 'user_dashboard' %}" class="btn btn-outline"><i class="fas fa-chart-bar"></i> Statistika</a>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn"><i class="fas fa-sign-out-alt"></i> Chiqish</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-outline">Kirish</a>
+                <a href="{% url 'signup' %}" class="btn btn-fill">Ro'yxatdan o'tish</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="hero-section">
+        <h1 class="hero-title">Ekologik muammolar xaritasi</h1>
+        <p style="margin-bottom: 25px; opacity: 0.9;">Hozirgacha tizimga <b>{{ complaints_count }}</b> ta murojaat kelib tushdi.</p>
+        
+        <form method="get" class="filter-box">
+            <select name="region">
+                <option value="">Barcha Viloyatlar</option>
+                {% for region in regions %}
+                    <option value="{{ region.id }}" {% if selected_region == region.id %}selected{% endif %}>{{ region.name }}</option>
+                {% endfor %}
+            </select>
+            <select name="district" id="districtSelect">
+                <option value="">Barcha Tumanlar</option>
+            </select>
+            <button type="submit"><i class="fas fa-search"></i> Filtrlash</button>
+        </form>
+    </section>
+
+    <div class="container">
+        
+        <!-- INTERACTIVE MAP -->
+        <div class="map-wrapper">
+            <div id="uzbMap"></div>
+        </div>
+
+        <!-- TOP 10 LIST -->
+        <h2 class="section-title">
+            <i class="fas fa-fire" style="color: #e74c3c;"></i> Eng muhim muammolar (Top 10)
+        </h2>
+        
+        <div class="top-grid">
+            {% for item in top_complaints %}
+            <div class="complaint-card">
+                <div class="card-header">
+                    <div class="card-title">{{ item.title|truncatechars:40 }}</div>
+                    <span class="priority-badge">Yuqori</span>
+                </div>
+                <div class="card-location">
+                    <i class="fas fa-map-marker-alt"></i> {{ item.region.name }}, {{ item.district.name }}
+                </div>
+                <div style="font-size: 0.9rem; color: #555; margin-bottom: 15px;">
+                    {{ item.description|truncatechars:80 }}
+                </div>
+                <div class="card-footer">
+                    <span style="color: #888;">{{ item.created_at|date:"d.m.Y" }}</span>
+                    {% if item.status == 'new' %}
+                        <span class="status-badge status-new">Yangi</span>
+                    {% elif item.status == 'in_progress' %}
+                        <span class="status-badge status-progress">Jarayonda</span>
+                    {% else %}
+                        <span class="status-badge status-closed">Yopilgan</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+                <p style="grid-column: 1/-1; text-align: center; color: #888;">Yuqori darajadagi murojaatlar mavjud emas.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Hidden Data -->
+    <div id="mapData" data-complaints='{{ map_data|safe }}'></div>
+    <div id="districtsData" data-districts='{{ districts_json|safe }}' data-selected="{{ selected_district|default:'None' }}"></div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // 1. Tumanlarni filtrlash (Oldingi logika)
+            const regionSelect = document.querySelector('select[name="region"]');
+            const districtSelect = document.getElementById('districtSelect');
+            const districtsData = document.getElementById('districtsData');
+            const districts = JSON.parse(districtsData.dataset.districts);
+            const selectedDistrictId = districtsData.dataset.selected === 'None' ? null : parseInt(districtsData.dataset.selected);
+
+            function updateDistricts() {
+                const selectedRegion = regionSelect.value;
+                districtSelect.innerHTML = '<option value="">Barcha Tumanlar</option>';
+                if (selectedRegion) {
+                    districts.filter(d => d.region_id == selectedRegion).forEach(d => {
+                        const option = document.createElement('option');
+                        option.value = d.id;
+                        option.textContent = d.name;
+                        if (selectedDistrictId && d.id == selectedDistrictId) option.selected = true;
+                        districtSelect.appendChild(option);
+                    });
+                }
+            }
+            regionSelect.addEventListener('change', updateDistricts);
+            updateDistricts();
+
+            // 2. Leaflet Xaritasi
+            const mapElement = document.getElementById('uzbMap');
+            if (mapElement) {
+                // O'zbekiston markazi
+                const map = L.map('uzbMap', {
+                    scrollWheelZoom: false // Scroll qilganda zoom bo'lib ketmasligi uchun
+                }).setView([41.3775, 64.5853], 6);
+
+                // Chiroyli CartoDB xarita qatlami (toza ko'rinish uchun)
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                    subdomains: 'abcd',
+                    maxZoom: 19
+                }).addTo(map);
+
+                // Ma'lumotlarni olish
+                const complaintsData = JSON.parse(document.getElementById('mapData').dataset.complaints);
+
+                // Markerlarni chizish
+                complaintsData.forEach(item => {
+                    // Prioritetga qarab rang tanlash
+                    let color = '#2e7d32'; // Green (Low)
+                    let radius = 8;
+                    
+                    if (item.priority === 'high') {
+                        color = '#e74c3c'; // Red
+                        radius = 12; // Kattaroq
+                    } else if (item.priority === 'medium') {
+                        color = '#f1c40f'; // Yellow
+                        radius = 10;
+                    }
+
+                    // Oddiy marker o'rniga CircleMarker (zamonaviy ko'rinish)
+                    const marker = L.circleMarker([item.lat, item.lng], {
+                        radius: radius,
+                        fillColor: color,
+                        color: "#fff",
+                        weight: 2,
+                        opacity: 1,
+                        fillOpacity: 0.8
+                    }).addTo(map);
+
+                    // Popup oynasi
+                    const popupContent = `
+                        <div class="popup-header">${item.title}</div>
+                        <div class="popup-body">
+                            <p style="margin:0 0 5px; color:#666;">${item.region}, ${item.district}</p>
+                            <span class="popup-status">${item.status}</span>
+                        </div>
+                    `;
+                    marker.bindPopup(popupContent);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

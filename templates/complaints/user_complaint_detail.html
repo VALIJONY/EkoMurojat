@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+{% load l10n %} {# Localization uchun, raqamlarni to'g'ri formatlash uchun #}
+
+{% block title %}{{ complaint.title }} - EkoMurojat{% endblock %}
+
+<!-- Leaflet CSS va JS ni ulash (faqat shu sahifa uchun) -->
+{% block extra_head %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <style>
+        /* Xarita konteyneri balandligi */
+        #map { height: 350px; width: 100%; border-radius: 1.5rem; } /* Tailwind radius-2xl ga mos */
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-7xl">
+    
+    <!-- 1. Header Section -->
+    <div class="flex flex-col md:flex-row justify-between items-start gap-4 mb-8">
+        <div class="flex-1">
+            <div class="flex items-center gap-3 mb-2">
+                <a href="{% url 'user_complaints' %}" class="text-slate-400 hover:text-emerald-600 transition-colors flex items-center gap-1 text-sm font-medium">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    Orqaga
+                </a>
+                <span class="text-slate-300 text-base">|</span>
+                <span class="text-slate-500 text-sm font-semibold">ID: #{{ complaint.id }}</span>
+            </div>
+            <h1 class="text-3xl font-bold text-slate-900 leading-tight mb-3">{{ complaint.title }}</h1>
+            
+            <div class="flex flex-wrap gap-2">
+                <!-- Status Badge -->
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold uppercase tracking-wide border
+                    {% if complaint.status == 'new' %} bg-blue-50 text-blue-700 border-blue-100
+                    {% elif complaint.status == 'in_progress' %} bg-orange-50 text-orange-700 border-orange-100
+                    {% elif complaint.status == 'closed' %} bg-emerald-50 text-emerald-700 border-emerald-100
+                    {% elif complaint.status == 'rejected' %} bg-red-50 text-red-700 border-red-100 {% endif %}">
+                    {{ complaint.get_status_display }}
+                </span>
+                <!-- Priority Badge -->
+                <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                    <span class="w-2 h-2 rounded-full 
+                        {% if complaint.priority == 'high' %} bg-red-500
+                        {% elif complaint.priority == 'medium' %} bg-yellow-500
+                        {% else %} bg-slate-400 {% endif %}"></span>
+                    {{ complaint.get_priority_display }}
+                </span>
+            </div>
+        </div>
+
+        <!-- Action Buttons (O'ng tomonda) -->
+        <div class="flex gap-3 pt-2">
+            {% if user.is_authenticated and user == complaint.user and complaint.status == 'new' and not complaint.masul_tashkilot %}
+                <a href="{% url 'user_complaint_delete' complaint.pk %}" class="px-5 py-2.5 bg-white border border-red-100 text-red-600 font-medium rounded-xl hover:bg-red-50 hover:border-red-200 transition shadow-sm flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    O'chirish
+                </a>
+            {% endif %}
+            {# Admin/Moderator/Tashkilot uchun edit/process tugmalari bu yerda bo'ladi #}
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- 2. Left Column: Main Content (2/3) -->
+        <div class="lg:col-span-2 space-y-8">
+            
+            <!-- Description Card -->
+            <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/50">
+                <h3 class="text-xl font-bold text-slate-800 mb-5 border-b border-slate-100 pb-3 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                    Murojaat mazmuni
+                </h3>
+                <div class="prose max-w-none text-slate-700 leading-relaxed text-lg">
+                    {{ complaint.description|linebreaks }}
+                </div>
+            </div>
+
+            <!-- Images Gallery -->
+            {% if complaint.images.all %}
+            <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/50">
+                <h3 class="text-xl font-bold text-slate-800 mb-5 border-b border-slate-100 pb-3 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    Ilova qilingan rasmlar
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    {% for image in complaint.images.all %}
+                    <a href="{{ image.img.url }}" target="_blank" class="block group relative overflow-hidden rounded-2xl h-48 sm:h-56 border border-slate-100 shadow-md">
+                        <img src="{{ image.img.url }}" alt="Murojaat rasmi" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                            <span class="bg-white/90 text-slate-800 px-3 py-1 rounded-lg text-sm font-medium shadow-lg">Kattalashtirish</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Answer Section (If resolved) -->
+            {% if complaint.answer_text %}
+            <div class="bg-emerald-50 p-6 rounded-3xl border border-emerald-200 shadow-xl shadow-emerald-200/50 relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-10">
+                    <svg class="w-24 h-24 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                </div>
+                <h3 class="text-xl font-bold text-emerald-800 mb-3 flex items-center gap-2">
+                    <span class="bg-emerald-200 text-emerald-700 p-1.5 rounded-full"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></span>
+                    Tashkilot javobi
+                </h3>
+                <p class="text-emerald-900 leading-relaxed relative z-10 text-lg">
+                    {{ complaint.answer_text|linebreaks }}
+                </p>
+                <div class="mt-5 text-sm text-emerald-600 font-medium">
+                    Yopilgan vaqti: {{ complaint.closed_at|date:"d.m.Y H:i" }}
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+
+        <!-- 3. Right Column: Sidebar (1/3) -->
+        <div class="space-y-6">
+            
+            <!-- Map Card -->
+            <div class="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden p-6">
+                <h3 class="font-bold text-xl text-slate-800 mb-4 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    Lokatsiya
+                </h3>
+                
+                {% if complaint.location %}
+                    <div id="map" class="rounded-2xl border border-slate-200 shadow-md"></div>
+                    <div class="mt-4 p-4 text-sm text-slate-700 bg-slate-50 rounded-xl">
+                        <p class="mb-1"><span class="font-semibold text-slate-800">Viloyat:</span> {{ complaint.region.name }}</p>
+                        <p><span class="font-semibold text-slate-800">Tuman:</span> {{ complaint.district.name }}</p>
+                    </div>
+                {% else %}
+                    <div class="h-40 flex items-center justify-center bg-slate-50 text-slate-400 text-base font-medium rounded-2xl border border-dashed border-slate-200">
+                        Lokatsiya belgilanmagan
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Details Card -->
+            <div class="bg-white rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/50 p-6">
+                <h3 class="font-bold text-xl text-slate-800 mb-4 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Qo'shimcha ma'lumotlar
+                </h3>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center py-2 border-b border-slate-100 last:border-b-0">
+                        <span class="text-slate-600 text-sm">Yaratilgan sana</span>
+                        <span class="font-medium text-slate-800">{{ complaint.created_at|date:"d.m.Y H:i" }}</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-slate-100 last:border-b-0">
+                        <span class="text-slate-600 text-sm">Oxirgi o'zgarish</span>
+                        <span class="font-medium text-slate-800">{{ complaint.updated_at|date:"d.m.Y H:i" }}</span>
+                    </div>
+                    {% if complaint.closed_at %}
+                    <div class="flex justify-between items-center py-2 border-b border-slate-100 last:border-b-0">
+                        <span class="text-slate-600 text-sm">Yopilgan vaqti</span>
+                        <span class="font-medium text-slate-800">{{ complaint.closed_at|date:"d.m.Y H:i" }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="pt-2">
+                        <span class="text-slate-600 text-sm block mb-2">Mas'ul tashkilot</span>
+                        {% if complaint.masul_tashkilot %}
+                            <div class="flex items-center gap-2 text-emerald-700 bg-emerald-50 px-3 py-2 rounded-xl font-medium shadow-sm">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                                {{ complaint.masul_tashkilot.name }}
+                            </div>
+                        {% else %}
+                            <span class="text-slate-400 italic text-sm bg-slate-50 px-3 py-2 rounded-xl">Biriktirilmagan</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% if complaint.location %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // |unlocalize filtri raqamni vergul emas, nuqta bilan chiqishini ta'minlaydi
+        var lat = {{ complaint.location.y|unlocalize }};
+        var lon = {{ complaint.location.x|unlocalize }};
+
+        var map = L.map('map', { zoomControl: false }).setView([lat, lon], 14);
+        
+        // Kartaning yangi stili (CartoDB Voyager)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap &copy; CARTO',
+            maxZoom: 20
+        }).addTo(map);
+
+        // Custom Marker Icon
+        const customIcon = L.divIcon({
+            className: 'custom-map-pin',
+            html: `<div style="background-color: #ef4444; width: 28px; height: 28px; border-radius: 50%; border: 5px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3);"></div>`,
+            iconSize: [28, 28], // Size of the icon
+            iconAnchor: [14, 14] // Point of the icon which will correspond to marker's location
+        });
+
+        L.marker([lat, lon], {icon: customIcon}).addTo(map)
+            .bindPopup("<b>Murojaat joylashuvi</b><br>{{ complaint.district.name }}")
+            .openPopup();
+        
+        // Zoom Controlsni o'ng pastga qo'shish
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+    });
+</script>
+{% endif %}
+
+{% endblock %}

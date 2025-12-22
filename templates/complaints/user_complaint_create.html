@@ -1,0 +1,314 @@
+{% extends 'base.html' %}
+
+{% block title %}Yangi murojaat - EkoMurojat{% endblock %}
+
+{% block content %}
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<div class="min-h-screen bg-slate-50/50 pb-12">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">Yangi murojaat</h1>
+                <p class="text-slate-500 mt-2 text-lg">Tabiatni asrashga qo'shgan hissangiz uchun rahmat.</p>
+            </div>
+            <a href="{% url 'user_complaints' %}" class="hidden md:flex items-center gap-2 px-5 py-2.5 text-slate-600 font-medium hover:bg-white hover:shadow-md rounded-2xl transition-all">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                Bekor qilish
+            </a>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="relative">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                <!-- LEFT COLUMN: FORM DETAILS (7 cols) -->
+                <div class="lg:col-span-7 space-y-6">
+                    
+                    <!-- 1. Asosiy Ma'lumotlar Card -->
+                    <div class="bg-white rounded-[2rem] p-8 shadow-xl shadow-slate-200/50 border border-slate-100">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            </div>
+                            <h2 class="text-xl font-bold text-slate-800">Muammo haqida</h2>
+                        </div>
+
+                        <div class="space-y-6">
+                            <!-- Title Input -->
+                            <div class="group">
+                                <label class="block text-sm font-bold text-slate-700 mb-2 ml-1">Sarlavha</label>
+                                <div class="relative">
+                                    {{ form.title }}
+                                    <div class="absolute right-4 top-3.5 text-slate-400">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                    </div>
+                                </div>
+                                {% if form.title.errors %}
+                                    <p class="text-red-500 text-sm mt-1 ml-1">{{ form.title.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Description Input -->
+                            <div class="group">
+                                <label class="block text-sm font-bold text-slate-700 mb-2 ml-1">Batafsil tavsif</label>
+                                {{ form.description }}
+                                {% if form.description.errors %}
+                                    <p class="text-red-500 text-sm mt-1 ml-1">{{ form.description.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Hudud Card -->
+                    <div class="bg-white rounded-[2rem] p-8 shadow-xl shadow-slate-200/50 border border-slate-100">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            </div>
+                            <h2 class="text-xl font-bold text-slate-800">Hudud</h2>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2 ml-1">Viloyat</label>
+                                <div class="relative">
+                                    {{ form.region }}
+                                    <div class="absolute right-4 top-3.5 text-slate-400 pointer-events-none">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2 ml-1">Tuman</label>
+                                <div class="relative">
+                                    {{ form.district }}
+                                    <div class="absolute right-4 top-3.5 text-slate-400 pointer-events-none">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Media Upload Card -->
+                    <div class="bg-white rounded-[2rem] p-8 shadow-xl shadow-slate-200/50 border border-slate-100">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            </div>
+                            <h2 class="text-xl font-bold text-slate-800">Rasmlar</h2>
+                        </div>
+
+                        <!-- Modern Dropzone -->
+                        <div class="relative group">
+                            <input type="file" id="imageInput" name="images" multiple accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                            
+                            <div class="border-3 border-dashed border-slate-200 rounded-3xl p-10 text-center transition-all duration-300 group-hover:border-emerald-500 group-hover:bg-emerald-50/30">
+                                <div class="w-20 h-20 bg-slate-50 rounded-full mx-auto flex items-center justify-center mb-4 shadow-sm group-hover:scale-110 transition-transform duration-300">
+                                    <svg class="w-10 h-10 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                                </div>
+                                <h3 class="text-lg font-bold text-slate-800 mb-1">Rasm yuklash uchun bosing</h3>
+                                <p class="text-slate-400">yoki fayllarni bu yerga tashlang</p>
+                            </div>
+                        </div>
+
+                        <!-- Previews Grid -->
+                        <div id="imagePreviews" class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6"></div>
+                    </div>
+
+                    <!-- Submit Button Mobile -->
+                    <div class="block lg:hidden mt-6">
+                        <button type="submit" class="w-full py-4 bg-emerald-600 text-white font-bold rounded-2xl shadow-lg shadow-emerald-200 text-lg">
+                            Murojaatni yuborish
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- RIGHT COLUMN: STICKY MAP (5 cols) -->
+                <div class="lg:col-span-5 relative">
+                    <div class="sticky top-24 space-y-4">
+                        
+                        <div class="bg-white rounded-[2.5rem] p-2 shadow-2xl shadow-slate-300/50 border border-slate-100 overflow-hidden relative group">
+                            
+                            <!-- Hidden Field -->
+                            <div class="hidden">{{ form.location }}</div>
+
+                            <!-- Map Header Overlay -->
+                            <div class="absolute top-6 left-6 z-[400] bg-white/90 backdrop-blur-md px-4 py-2 rounded-2xl shadow-lg border border-slate-100">
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Manzilni tanlang</p>
+                                <p class="text-slate-800 font-bold flex items-center gap-1">
+                                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                                    Xaritadan belgilang
+                                </p>
+                            </div>
+
+                            <!-- The Map -->
+                            <div id="location-map" class="w-full h-[500px] lg:h-[calc(100vh-140px)] rounded-[2rem] z-0 bg-slate-100"></div>
+
+                            <!-- Floating Action Buttons -->
+                            <div class="absolute bottom-6 right-6 z-[400] flex flex-col gap-3">
+                                <button type="button" id="locate-me-btn" class="bg-white text-slate-700 w-12 h-12 rounded-2xl shadow-xl flex items-center justify-center hover:bg-emerald-50 hover:text-emerald-600 transition-all active:scale-95" title="Hozirgi joyim">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                </button>
+                            </div>
+
+                        </div>
+                        
+                        <!-- Submit Button Desktop -->
+                        <button type="submit" class="hidden lg:flex w-full py-4 bg-emerald-600 text-white font-bold rounded-2xl shadow-xl shadow-emerald-500/30 hover:bg-emerald-700 hover:shadow-2xl hover:-translate-y-1 transition-all items-center justify-center gap-2 text-lg">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                            Murojaatni yuborish
+                        </button>
+                        
+                        {% if form.location.errors %}
+                            <div class="bg-red-50 text-red-600 px-4 py-3 rounded-xl text-sm font-medium text-center">
+                                Iltimos, xaritadan joylashuvni belgilang!
+                            </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // 1. Tailwind Input Styling
+    document.addEventListener('DOMContentLoaded', () => {
+        const styleInputs = (selector) => {
+            document.querySelectorAll(selector).forEach(el => {
+                el.classList.add('w-full', 'bg-slate-50', 'text-slate-900', 'font-medium', 'border-0', 'rounded-2xl', 'px-5', 'py-4', 'focus:ring-4', 'focus:ring-emerald-500/20', 'focus:bg-white', 'transition-all', 'placeholder-slate-400');
+            });
+        };
+        styleInputs('input[type="text"]');
+        styleInputs('textarea');
+        styleInputs('select');
+        
+        // Select uchun o'ng tomondagi iconni to'g'irlash uchun padding
+        document.querySelectorAll('select').forEach(el => el.classList.add('appearance-none'));
+    });
+
+    // 2. Map Logic
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof L === 'undefined') return;
+
+        const mapEl = document.getElementById('location-map');
+        const locInput = document.getElementById('id_location');
+        if (!mapEl) return;
+
+        // Default: Tashkent
+        let lat = 41.3111, lng = 69.2797, hasPoint = false;
+
+        // Check existing value
+        if (locInput && locInput.value) {
+            const match = locInput.value.match(/POINT\s*\(([-0-9\.]+)\s+([-0-9\.]+)\)/i);
+            if (match) {
+                lng = parseFloat(match[1]);
+                lat = parseFloat(match[2]);
+                hasPoint = true;
+            }
+        }
+
+        const map = L.map('location-map', { zoomControl: false }).setView([lat, lng], hasPoint ? 15 : 12);
+        
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap &copy; CARTO',
+            maxZoom: 20
+        }).addTo(map);
+
+        let marker;
+
+        const setMarker = (l, ln) => {
+            if (marker) map.removeLayer(marker);
+            
+            // Custom Icon
+            const icon = L.divIcon({
+                className: 'custom-pin',
+                html: `<div style="background-color: #10b981; width: 24px; height: 24px; border-radius: 50%; border: 4px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3);"></div>`,
+                iconSize: [24, 24],
+                iconAnchor: [12, 12]
+            });
+
+            marker = L.marker([l, ln], { icon: icon, draggable: true }).addTo(map);
+            if (locInput) locInput.value = `POINT(${ln} ${l})`;
+
+            marker.on('dragend', e => {
+                const { lat, lng } = e.target.getLatLng();
+                if (locInput) locInput.value = `POINT(${lng} ${lat})`;
+            });
+        };
+
+        if (hasPoint) setMarker(lat, lng);
+
+        map.on('click', e => setMarker(e.latlng.lat, e.latlng.lng));
+
+        // Locate Me
+        const btn = document.getElementById('locate-me-btn');
+        if (btn) {
+            btn.addEventListener('click', () => {
+                if(!navigator.geolocation) return alert('Geolokatsiya qo\'llab-quvvatlanmaydi');
+                
+                btn.innerHTML = `<svg class="animate-spin w-6 h-6 text-emerald-600" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`;
+                
+                navigator.geolocation.getCurrentPosition(pos => {
+                    const { latitude, longitude } = pos.coords;
+                    map.setView([latitude, longitude], 16);
+                    setMarker(latitude, longitude);
+                    btn.innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>`;
+                }, () => {
+                    alert('Joylashuv aniqlanmadi');
+                    btn.innerHTML = `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>`;
+                });
+            });
+        }
+    });
+
+    // 3. Image Preview Logic
+    document.addEventListener('DOMContentLoaded', () => {
+        const input = document.getElementById('imageInput');
+        const container = document.getElementById('imagePreviews');
+        let dt = new DataTransfer();
+
+        input.addEventListener('change', e => {
+            for(let file of e.target.files) {
+                if(!file.type.startsWith('image/')) continue;
+                dt.items.add(file);
+
+                const reader = new FileReader();
+                reader.onload = ev => {
+                    const div = document.createElement('div');
+                    div.className = 'relative group aspect-square rounded-2xl overflow-hidden shadow-md cursor-pointer';
+                    div.innerHTML = `
+                        <img src="${ev.target.result}" class="w-full h-full object-cover transition-transform group-hover:scale-110">
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span class="text-white bg-red-500 rounded-full p-2 hover:bg-red-600 transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </span>
+                        </div>
+                    `;
+                    div.onclick = () => {
+                        const newDt = new DataTransfer();
+                        [...dt.files].forEach(f => { if(f !== file) newDt.items.add(f); });
+                        dt = newDt;
+                        input.files = dt.files;
+                        div.remove();
+                    };
+                    container.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            }
+            input.files = dt.files;
+        });
+    });
+</script>
+{% endblock %}

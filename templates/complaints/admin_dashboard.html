@@ -1,0 +1,294 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - EkoMurojat{% endblock %}
+
+{% block extra_head %}
+<!-- Remix Icon ulanishi (Professional Ikonkalar uchun) -->
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-7xl">
+    
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-3">
+                <i class="ri-dashboard-3-line text-emerald-600"></i>
+                Admin Dashboard
+            </h1>
+            <p class="text-slate-500 mt-1 ml-1">Tizim holati va statistikalari</p>
+        </div>
+        
+        <div class="flex gap-3">
+            <a href="{% url 'users_admin' %}" class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 transition shadow-sm font-medium">
+                <i class="ri-user-settings-line"></i> Foydalanuvchilar
+            </a>
+            <a href="{% url 'organizations_admin' %}" class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 transition shadow-sm font-medium">
+                <i class="ri-building-4-line"></i> Tashkilotlar
+            </a>
+            <a href="{% url 'admin_priority_management' %}" class="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition shadow-md shadow-emerald-200 font-medium">
+                <i class="ri-settings-4-line"></i> Sozlamalar
+            </a>
+        </div>
+    </div>
+
+    <!-- MAIN STATS GRID -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-8">
+        
+        <!-- Jami -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all group">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Jami</p>
+                    <h3 class="text-2xl font-bold text-slate-800 mt-1">{{ total_count }}</h3>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center text-xl group-hover:bg-slate-600 group-hover:text-white transition-colors">
+                    <i class="ri-folder-info-line"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Yangi -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all group">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Yangi</p>
+                    <h3 class="text-2xl font-bold text-blue-600 mt-1">{{ new_count }}</h3>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xl group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                    <i class="ri-flashlight-fill"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Jarayonda -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all group">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Jarayonda</p>
+                    <h3 class="text-2xl font-bold text-orange-500 mt-1">{{ in_progress_count }}</h3>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-orange-50 text-orange-500 flex items-center justify-center text-xl group-hover:bg-orange-500 group-hover:text-white transition-colors">
+                    <i class="ri-loader-4-line animate-spin-slow"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Yopilgan -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all group">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Yopilgan</p>
+                    <h3 class="text-2xl font-bold text-emerald-600 mt-1">{{ closed_count }}</h3>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                    <i class="ri-checkbox-circle-line"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rad etilgan -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all group">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Rad etilgan</p>
+                    <h3 class="text-2xl font-bold text-red-500 mt-1">{{ rejected_count }}</h3>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-red-50 text-red-500 flex items-center justify-center text-xl group-hover:bg-red-500 group-hover:text-white transition-colors">
+                    <i class="ri-close-circle-line"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRIORITY & REGIONS GRID -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        
+        <!-- Priority Cards (1 Column) -->
+        <div class="space-y-6">
+            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <i class="ri-flag-2-line text-emerald-600"></i> Muhimlik darajasi
+            </h2>
+            
+            <!-- High -->
+            <div class="bg-white p-5 rounded-2xl border border-red-100 shadow-sm flex items-center justify-between relative overflow-hidden group">
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-red-500"></div>
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center text-lg">
+                        <i class="ri-alarm-warning-fill"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-800">Yuqori</h4>
+                        <p class="text-xs text-slate-400">Tezkor yechim talab qiladigan</p>
+                    </div>
+                </div>
+                <span class="text-2xl font-bold text-red-600">{{ high_priority }}</span>
+            </div>
+
+            <!-- Medium -->
+            <div class="bg-white p-5 rounded-2xl border border-yellow-100 shadow-sm flex items-center justify-between relative overflow-hidden group">
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-yellow-400"></div>
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full bg-yellow-50 text-yellow-600 flex items-center justify-center text-lg">
+                        <i class="ri-alert-fill"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-800">O'rta</h4>
+                        <p class="text-xs text-slate-400">Standart navbatdagi</p>
+                    </div>
+                </div>
+                <span class="text-2xl font-bold text-yellow-600">{{ medium_priority }}</span>
+            </div>
+
+            <!-- Low -->
+            <div class="bg-white p-5 rounded-2xl border border-emerald-100 shadow-sm flex items-center justify-between relative overflow-hidden group">
+                <div class="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500"></div>
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">
+                        <i class="ri-flag-line"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-800">Past</h4>
+                        <p class="text-xs text-slate-400">Rejali tartibdagi</p>
+                    </div>
+                </div>
+                <span class="text-2xl font-bold text-emerald-600">{{ low_priority }}</span>
+            </div>
+        </div>
+
+        <!-- Region Stats (2 Columns) -->
+        <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <i class="ri-map-pin-line text-emerald-600"></i> Viloyatlar kesimida
+                </h2>
+                <button class="text-sm text-emerald-600 font-medium hover:text-emerald-700">To'liq hisobot</button>
+            </div>
+
+            {% if region_stats %}
+                <div class="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                    {% for stat in region_stats %}
+                    <div class="group">
+                        <div class="flex justify-between items-end mb-1">
+                            <span class="text-sm font-semibold text-slate-700">{{ stat.region__name }}</span>
+                            <span class="text-sm font-bold text-slate-900">{{ stat.count }} ta</span>
+                        </div>
+                        <!-- Progress Bar Visual -->
+                        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                            <!-- Width ni dinamik hisoblash uchun style ga % berish kerak. Hozircha statik 50% turibdi, buni backenddan foizda olib kelish zo'r bo'lardi, yoki JS bilan qilsa bo'ladi. -->
+                            <!-- Oddiylik uchun: count * 2px yoki shunga o'xshash logika, yoki shunchaki to'ldirilgan vizual -->
+                            <div class="bg-emerald-500 h-2.5 rounded-full" style="width: calc(({{ stat.count }} / {{ total_count }}) * 100%)"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="flex flex-col items-center justify-center h-48 text-slate-400">
+                    <i class="ri-bar-chart-2-line text-4xl mb-2"></i>
+                    <p>Ma'lumotlar yetarli emas</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- RECENT COMPLAINTS TABLE -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <i class="ri-time-line text-emerald-600"></i>
+                Oxirgi murojaatlar
+            </h2>
+            <a href="{% url 'complaints_admin' %}" class="text-sm font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1">
+                Barchasini ko'rish <i class="ri-arrow-right-line"></i>
+            </a>
+        </div>
+
+        {% if recent_complaints %}
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="text-slate-500 text-xs uppercase tracking-wider bg-slate-50 border-b border-slate-100">
+                            <th class="px-6 py-4 font-semibold">Murojaat</th>
+                            <th class="px-6 py-4 font-semibold">Foydalanuvchi</th>
+                            <th class="px-6 py-4 font-semibold">Hudud</th>
+                            <th class="px-6 py-4 font-semibold">Sana</th>
+                            <th class="px-6 py-4 font-semibold">Status</th>
+                            <th class="px-6 py-4 font-semibold">Amallar</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for complaint in recent_complaints %}
+                        <tr class="hover:bg-slate-50/80 transition-colors group">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="flex-shrink-0 w-8 h-8 rounded-full 
+                                        {% if complaint.priority == 'high' %} bg-red-100 text-red-500
+                                        {% elif complaint.priority == 'medium' %} bg-yellow-100 text-yellow-600
+                                        {% else %} bg-emerald-100 text-emerald-600 {% endif %} 
+                                        flex items-center justify-center">
+                                        <i class="ri-file-text-line"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-slate-800 text-sm">{{ complaint.title|truncatechars:30 }}</div>
+                                        <div class="text-xs text-slate-500">ID: #{{ complaint.id }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-slate-600">
+                                <div class="flex items-center gap-2">
+                                    <i class="ri-user-line text-slate-400"></i>
+                                    {{ complaint.user.username }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-slate-600">
+                                {{ complaint.region.name }}
+                            </td>
+                            <td class="px-6 py-4 text-sm text-slate-500">
+                                {{ complaint.created_at|date:"d.m.Y" }}
+                            </td>
+                            <td class="px-6 py-4">
+                                <span class="px-2.5 py-1 rounded-full text-xs font-bold border
+                                    {% if complaint.status == 'new' %} bg-blue-50 text-blue-600 border-blue-100
+                                    {% elif complaint.status == 'in_progress' %} bg-orange-50 text-orange-600 border-orange-100
+                                    {% elif complaint.status == 'closed' %} bg-emerald-50 text-emerald-600 border-emerald-100
+                                    {% elif complaint.status == 'rejected' %} bg-red-50 text-red-600 border-red-100 {% endif %}">
+                                    {{ complaint.get_status_display }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <a href="{% url 'complaint_detail_admin' complaint.pk %}" class="text-slate-400 hover:text-emerald-600 transition-colors text-lg" title="Ko'rish">
+                                    <i class="ri-eye-line"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="p-8 text-center text-slate-500">
+                <i class="ri-inbox-line text-4xl mb-2 block text-slate-300"></i>
+                Hozircha yangi murojaatlar yo'q
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    /* Custom Scrollbar for Region Stats */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f5f9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+</style>
+{% endblock %}

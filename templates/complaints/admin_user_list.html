@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}Foydalanuvchilar - Admin{% endblock %}
+
+{% block extra_head %}
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-7xl">
+    
+    <!-- Page Header -->
+    <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-3">
+                <i class="ri-user-settings-line text-emerald-600"></i>
+                Foydalanuvchilar
+            </h1>
+            <p class="text-slate-500 mt-1 ml-1">Tizimdagi barcha foydalanuvchilar ro'yxati</p>
+        </div>
+        
+        <a href="{% url 'user_create_admin' %}" class="px-6 py-2.5 bg-emerald-600 text-white font-bold rounded-xl shadow-lg shadow-emerald-200 hover:bg-emerald-700 hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center gap-2">
+            <i class="ri-user-add-line text-xl"></i> Yangi foydalanuvchi
+        </a>
+    </div>
+
+    {% if users %}
+        <!-- Table Container -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <!-- Table Head -->
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-100">
+                            <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Foydalanuvchi</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Aloqa</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Rol / Sana</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Amallar</th>
+                        </tr>
+                    </thead>
+                    
+                    <!-- Table Body -->
+                    <tbody class="divide-y divide-slate-100">
+                        {% for user in users %}
+                        <tr class="hover:bg-slate-50/80 transition-colors group">
+                            
+                            <!-- User Info -->
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-4">
+                                    <!-- Avatar -->
+                                    <div class="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center text-xl font-bold
+                                        {% if user.role == 'admin' %} bg-purple-100 text-purple-600
+                                        {% elif user.role == 'moderator' %} bg-blue-100 text-blue-600
+                                        {% else %} bg-emerald-100 text-emerald-600 {% endif %}">
+                                        {{ user.username|slice:":1"|upper }}
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-slate-800 text-base">{{ user.get_full_name|default:user.username }}</div>
+                                        <div class="text-xs text-slate-400 font-mono">@{{ user.username }}</div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Contact Info -->
+                            <td class="px-6 py-4">
+                                <div class="space-y-1.5">
+                                    <div class="flex items-center gap-2 text-sm text-slate-600">
+                                        <i class="ri-mail-line text-blue-500"></i>
+                                        <span>{{ user.email }}</span>
+                                    </div>
+                                    {% if user.tashkilot %}
+                                    <div class="flex items-center gap-2 text-sm text-slate-600">
+                                        <i class="ri-building-line text-emerald-500"></i>
+                                        <span>{{ user.tashkilot.name }}</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </td>
+
+                            <!-- Role & Status -->
+                            <td class="px-6 py-4">
+                                <div class="flex flex-col gap-2">
+                                    <span class="px-2 py-1 rounded-lg text-xs font-medium 
+                                        {% if user.role == 'admin' %} bg-purple-50 text-purple-600 border border-purple-100
+                                        {% elif user.role == 'moderator' %} bg-blue-50 text-blue-600 border border-blue-100
+                                        {% else %} bg-emerald-50 text-emerald-600 border border-emerald-100 {% endif %}">
+                                        {% if user.role == 'admin' %} Admin
+                                        {% elif user.role == 'moderator' %} Moderator
+                                        {% else %} Foydalanuvchi {% endif %}
+                                    </span>
+                                    <span class="text-xs text-slate-400 font-mono">{{ user.date_joined|date:"d.m.Y" }}</span>
+                                </div>
+                            </td>
+
+                            <!-- Actions -->
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <a href="{% url 'user_update_admin' user.pk %}" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all" title="Tahrirlash">
+                                        <i class="ri-edit-box-line text-lg"></i>
+                                    </a>
+                                    <a href="{% url 'user_delete_admin' user.pk %}" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all" title="O'chirish">
+                                        <i class="ri-delete-bin-line text-lg"></i>
+                                    </a>
+                                </div>
+                            </td>
+
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="flex justify-center mt-8">
+            <nav class="inline-flex rounded-xl shadow-sm bg-white border border-slate-200 p-1 space-x-1">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1" class="px-3 py-2 rounded-lg text-slate-500 hover:bg-slate-50 hover:text-emerald-600 transition-colors">
+                        <i class="ri-arrow-left-double-line"></i>
+                    </a>
+                    <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-2 rounded-lg text-slate-500 hover:bg-slate-50 hover:text-emerald-600 transition-colors">
+                        <i class="ri-arrow-left-s-line"></i>
+                    </a>
+                {% endif %}
+
+                <span class="px-4 py-2 rounded-lg bg-emerald-600 text-white font-medium shadow-md">
+                    {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-2 rounded-lg text-slate-500 hover:bg-slate-50 hover:text-emerald-600 transition-colors">
+                        <i class="ri-arrow-right-s-line"></i>
+                    </a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}" class="px-3 py-2 rounded-lg text-slate-500 hover:bg-slate-50 hover:text-emerald-600 transition-colors">
+                        <i class="ri-arrow-right-double-line"></i>
+                    </a>
+                {% endif %}
+            </nav>
+        </div>
+        {% endif %}
+
+    {% else %}
+        <!-- Empty State -->
+        <div class="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-slate-300 text-center">
+            <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-6 text-slate-400 text-4xl shadow-inner">
+                <i class="ri-user-search-line"></i>
+            </div>
+            <h2 class="text-xl font-bold text-slate-800 mb-2">Foydalanuvchilar topilmadi</h2>
+            <p class="text-slate-500 max-w-sm mb-8">Tizimda hozircha foydalanuvchilar yo'q. Birinchi foydalanuvchini yarating.</p>
+            <a href="{% url 'user_create_admin' %}" class="px-8 py-3 bg-emerald-600 text-white font-bold rounded-xl shadow-lg shadow-emerald-200 hover:bg-emerald-700 hover:-translate-y-0.5 transition-all flex items-center gap-2">
+                <i class="ri-user-add-circle-line text-xl"></i> Foydalanuvchi qo'shish
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

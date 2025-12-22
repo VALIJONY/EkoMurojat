@@ -1,0 +1,245 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}EkoMurojat - Tabiatni birga asraylik{% endblock %}</title>
+    
+    {% block extra_head %}{% endblock %}    
+    
+    <!-- Favicon (Ixtiyoriy) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌿</text></svg>">
+
+    <!-- Tailwind CSS CDN (Development uchun) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#10b981', // Emerald 500
+                        primaryDark: '#047857', // Emerald 700
+                        secondary: '#34d399', // Emerald 400
+                        dark: '#1f2937',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Slate 50 */
+        }
+        /* Scrollbar dizayni */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #10b981; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #047857; 
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen text-slate-800">
+
+    <!-- NAVBAR -->
+    <header class="fixed w-full top-0 z-50 transition-all duration-300" id="navbar">
+        <nav class="bg-white/80 backdrop-blur-md border-b border-slate-200 shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16 items-center">
+                    
+                    <!-- Logo -->
+                    <div class="flex-shrink-0 flex items-center">
+                        <a href="{% url 'home' %}" class="flex items-center gap-2 group">
+                            <span class="text-3xl transition-transform group-hover:scale-110">🌿</span>
+                            <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-green-500">
+                                EkoMurojat
+                            </span>
+                        </a>
+                    </div>
+
+                    <!-- Desktop Menu -->
+                    <div class="hidden md:flex items-center space-x-6">
+                        {% if user.is_authenticated %}
+                            
+                            <!-- User Role: Foydalanuvchi -->
+                            {% if user.role == 'user' %}
+                                <a href="{% url 'user_dashboard' %}" class="nav-link">Dashboard</a>
+                                <a href="{% url 'user_complaints' %}" class="nav-link">Murojaatlarim</a>
+                                <a href="{% url 'user_profile' %}" class="nav-link">Profil</a>
+                                <a href="{% url 'user_complaint_create' %}" class="btn-primary">
+                                    + Yangi murojaat
+                                </a>
+                            
+                            <!-- User Role: Admin -->
+                            {% elif user.role == 'admin' %}
+                                <a href="{% url 'dashboard_admin' %}" class="nav-link text-purple-600 font-semibold">Admin Panel</a>
+                                <a href="{% url 'complaints_admin' %}" class="nav-link">Barcha Murojaatlar</a>
+                                <a href="{% url 'organizations_admin' %}" class="nav-link">Tashkilotlar</a>
+                            
+                            <!-- User Role: Moderator -->
+                            {% elif user.role == 'moderator' %}
+                                <a href="{% url 'dashboard_moderator' %}" class="nav-link text-blue-600">Moderator Panel</a>
+                                <a href="{% url 'complaints_moderator' %}" class="nav-link">Ish stoli</a>
+                            {% endif %}
+
+                            <!-- Logout Button -->
+                            <form action="{% url 'logout' %}" method="post" class="inline">
+                                {% csrf_token %}
+                                <button type="submit" class="ml-4 text-red-500 hover:text-red-700 font-medium text-sm transition-colors flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                                    Chiqish
+                                </button>
+                            </form>
+
+                        {% else %}
+                            <!-- Guest Links -->
+                            <a href="{% url 'home' %}" class="nav-link">Bosh sahifa</a>
+                            <a href="{% url 'login' %}" class="text-slate-600 hover:text-emerald-600 font-medium transition-colors">Kirish</a>
+                            <a href="{% url 'signup' %}" class="btn-primary">
+                                Ro'yxatdan o'tish
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    <!-- Mobile Menu Button -->
+                    <div class="md:hidden flex items-center">
+                        <button id="mobile-menu-btn" class="text-slate-600 hover:text-emerald-600 focus:outline-none p-2">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile Menu (Hidden by default) -->
+            <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100 absolute w-full left-0 shadow-lg">
+                <div class="px-4 pt-2 pb-4 space-y-1 flex flex-col">
+                    {% if user.is_authenticated %}
+                        <div class="px-3 py-2 text-sm text-slate-400 uppercase font-bold tracking-wider border-b border-slate-100 mb-2">
+                            Menu
+                        </div>
+                        
+                        {% if user.role == 'user' %}
+                            <a href="{% url 'user_dashboard' %}" class="mobile-link">Dashboard</a>
+                            <a href="{% url 'user_complaints' %}" class="mobile-link">Murojaatlarim</a>
+                            <a href="{% url 'user_complaint_create' %}" class="mobile-link text-emerald-600 font-bold">+ Yangi murojaat</a>
+                            <a href="{% url 'user_profile' %}" class="mobile-link">Profil</a>
+                        {% elif user.role == 'admin' %}
+                            <a href="{% url 'dashboard_admin' %}" class="mobile-link">Admin Dashboard</a>
+                            <a href="{% url 'complaints_admin' %}" class="mobile-link">Murojaatlar</a>
+                        {% endif %}
+
+                        <form action="{% url 'logout' %}" method="post" class="block w-full">
+                            {% csrf_token %}
+                            <button type="submit" class="w-full text-left mobile-link text-red-500">Chiqish</button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'home' %}" class="mobile-link">Bosh sahifa</a>
+                        <a href="{% url 'login' %}" class="mobile-link">Kirish</a>
+                        <a href="{% url 'signup' %}" class="mobile-link text-emerald-600 font-bold">Ro'yxatdan o'tish</a>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <!-- pt-20 navbar fixed bo'lgani uchun contentni pastroqqa tushirishga kerak -->
+    <main class="flex-grow pt-24 pb-12">
+        
+        <!-- Flash Messages (Alerts) -->
+        {% if messages %}
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+                {% for message in messages %}
+                    <div class="flex items-center p-4 mb-4 rounded-lg shadow-sm border
+                        {% if message.tags == 'success' %} bg-green-50 border-green-200 text-green-700
+                        {% elif message.tags == 'error' %} bg-red-50 border-red-200 text-red-700
+                        {% elif message.tags == 'warning' %} bg-yellow-50 border-yellow-200 text-yellow-700
+                        {% else %} bg-blue-50 border-blue-200 text-blue-700 {% endif %}" 
+                        role="alert">
+                        
+                        <!-- Icon -->
+                        <div class="flex-shrink-0 mr-3">
+                            {% if message.tags == 'success' %}
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                            {% elif message.tags == 'error' %}
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+                            {% endif %}
+                        </div>
+                        <div class="text-sm font-medium">
+                            {{ message }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t border-slate-200 mt-auto">
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+            <div class="md:flex md:items-center md:justify-between">
+                <div class="flex justify-center md:justify-start gap-2 items-center mb-4 md:mb-0">
+                    <span class="text-2xl">🌿</span>
+                    <span class="text-slate-900 font-bold text-lg">EkoMurojat</span>
+                </div>
+                <div class="text-center md:text-right">
+                    <p class="text-slate-500 text-sm">
+                        &copy; {% now "Y" %} Barcha huquqlar himoyalangan. 
+                        <span class="hidden sm:inline">|</span> 
+                        <a href="#" class="hover:text-emerald-600 transition-colors">Maxfiylik siyosati</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Mobil Menyuni ochish/yopish uchun oddiy skript
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+    </script>
+
+    <!-- Custom Tailwind Components -->
+    <style type="text/tailwindcss">
+        @layer components {
+            .btn-primary {
+                @apply bg-emerald-600 text-white px-5 py-2.5 rounded-xl font-medium shadow-md shadow-emerald-200 hover:bg-emerald-700 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2;
+            }
+            .nav-link {
+                @apply text-slate-600 hover:text-emerald-600 font-medium px-3 py-2 rounded-lg transition-colors hover:bg-emerald-50;
+            }
+            .mobile-link {
+                @apply block px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-emerald-600 hover:bg-slate-50;
+            }
+        }
+    </style>
+</body>
+</html>

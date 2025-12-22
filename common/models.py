@@ -17,9 +17,6 @@ class District(models.Model):
     name = models.CharField(max_length=255, verbose_name="Tuman nomi")
     region = models.ForeignKey(Region, on_delete=models.CASCADE, related_name='districts', verbose_name="Viloyat")
     
-    # Agar kelajakda "Lokatsiya qaysi tumanga tushishini" avtomat aniqlash kerak bo'lsa,
-    # bu yerga PolygonField qo'shish kerak bo'ladi.
-    
     def __str__(self):
         return self.name
 

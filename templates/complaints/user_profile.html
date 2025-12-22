@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mening Profilim - EkoMurojat{% endblock %}
+
+{% block content %}
+<!-- Asosiy Konteyner -->
+<div class="container mx-auto px-4 py-8 max-w-6xl">
+    
+    <!-- Sahifa sarlavhasi -->
+    <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+        <h1 class="text-3xl font-bold text-gray-800 tracking-tight">Mening Profilim</h1>
+        <div class="flex gap-3">
+            <a href="{% url 'user_dashboard' %}" class="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 font-medium rounded-xl hover:bg-gray-50 hover:border-gray-300 transition shadow-sm flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Dashboard
+            </a>
+            <button class="px-5 py-2.5 bg-emerald-600 text-white font-medium rounded-xl hover:bg-emerald-700 transition shadow-md shadow-emerald-200 flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                Tahrirlash
+            </button>
+        </div>
+    </div>
+
+    <!-- Grid Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        
+        <!-- Chap tomon: Profil Asosiy qismi (2/3 qism) -->
+        <div class="lg:col-span-2 space-y-6">
+            
+            <!-- Profil Kartasi -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden relative">
+                
+                <!-- Orqa fon (Cover) -->
+                <div class="h-40 bg-gradient-to-r from-emerald-500 to-green-700 w-full relative">
+                    <div class="absolute inset-0 bg-black/10"></div> <!-- Overlay -->
+                </div>
+
+                <!-- Avatar va Ism qismi -->
+                <div class="px-6 md:px-8 pb-8 relative">
+                    <div class="flex flex-col md:flex-row items-end md:items-end gap-6 -mt-12 mb-6">
+                        <!-- Avatar -->
+                        <div class="relative group">
+                            <div class="w-32 h-32 rounded-full border-[5px] border-white shadow-lg overflow-hidden bg-gray-100 flex items-center justify-center text-4xl font-bold text-gray-400">
+                                {% if user.user_image %}
+                                    <img src="{{ user.user_image.url }}" alt="{{ user.username }}" class="w-full h-full object-cover">
+                                {% else %}
+                                    {{ user.username|slice:":1"|upper }}
+                                {% endif %}
+                            </div>
+                            <!-- Online status -->
+                            <div class="absolute bottom-2 right-2 w-5 h-5 bg-green-500 border-4 border-white rounded-full"></div>
+                        </div>
+
+                        <!-- Ism va Role -->
+                        <div class="flex-1 text-center md:text-left mb-2">
+                            <h2 class="text-2xl font-bold text-gray-900">{{ user.get_full_name|default:user.username }}</h2>
+                            <div class="flex flex-wrap gap-2 justify-center md:justify-start mt-2">
+                                <!-- Role Badge -->
+                                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide 
+                                    {% if user.role == 'admin' %} bg-purple-100 text-purple-700
+                                    {% elif user.role == 'moderator' %} bg-blue-100 text-blue-700
+                                    {% else %} bg-emerald-100 text-emerald-700 {% endif %}">
+                                    {{ user.get_role_display }}
+                                </span>
+                                
+                                <!-- Tashkilot Badge -->
+                                {% if user.tashkilot %}
+                                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-gray-100 text-gray-600 flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                                    {{ user.tashkilot.name }}
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="border-gray-100 mb-6">
+
+                    <!-- Ma'lumotlar Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-1">
+                            <p class="text-xs uppercase text-gray-400 font-bold tracking-wider">Foydalanuvchi nomi</p>
+                            <p class="text-gray-800 font-medium">@{{ user.username }}</p>
+                        </div>
+                        <div class="space-y-1">
+                            <p class="text-xs uppercase text-gray-400 font-bold tracking-wider">Email manzil</p>
+                            <p class="text-gray-800 font-medium">{{ user.email|default:"Kiritilmagan" }}</p>
+                        </div>
+                        <div class="space-y-1">
+                            <p class="text-xs uppercase text-gray-400 font-bold tracking-wider">Telefon raqam</p>
+                            <p class="text-gray-800 font-medium">{{ user.phone_number|default:"Kiritilmagan" }}</p>
+                        </div>
+                        <div class="space-y-1">
+                            <p class="text-xs uppercase text-gray-400 font-bold tracking-wider">Ro'yxatdan o'tgan</p>
+                            <p class="text-gray-800 font-medium">{{ user.created_at|date:"d F, Y" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- O'ng tomon: Sidebar Stats (1/3 qism) -->
+        <div class="space-y-6">
+            
+            <!-- Asosiy Statistika -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-5 transition hover:-translate-y-1 hover:shadow-md">
+                <div class="w-14 h-14 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl">
+                    📊
+                </div>
+                <div>
+                    <h3 class="text-3xl font-bold text-gray-800">{{ user.complaints.count }}</h3>
+                    <p class="text-gray-500 text-sm font-medium">Jami murojaatlar</p>
+                </div>
+            </div>
+
+            <!-- Mini Statistikalar -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 border-b-4 border-b-green-500 text-center">
+                    <span class="block text-2xl font-bold text-gray-800 mb-1">{{ user.complaints.filter.count|default:0 }}</span>
+                    <span class="text-xs text-gray-500 uppercase font-bold">Yopilgan</span>
+                </div>
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 border-b-4 border-b-orange-400 text-center">
+                    <span class="block text-2xl font-bold text-gray-800 mb-1">{{ user.complaints.filter.count|default:0 }}</span>
+                    <span class="text-xs text-gray-500 uppercase font-bold">Jarayonda</span>
+                </div>
+            </div>
+
+            <!-- Xavfsizlik bo'limi -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h3 class="font-bold text-gray-800 mb-2 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    Xavfsizlik
+                </h3>
+                <p class="text-sm text-gray-500 mb-6">Hisobingiz xavfsizligini ta'minlash uchun.</p>
+                
+                <div class="space-y-3">
+                    <a href="#" class="block w-full py-2.5 px-4 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl text-center font-medium transition duration-200">
+                        🔑 Parolni yangilash
+                    </a>
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full py-2.5 px-4 border border-red-100 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-medium transition duration-200 flex items-center justify-center gap-2">
+                            🚪 Chiqish
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

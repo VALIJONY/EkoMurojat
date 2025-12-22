@@ -2,7 +2,7 @@ from django.contrib.gis.db import models
 
 from django.conf import settings # User modelni olishning to'g'ri yo'li
 from common.models import Region, District, Tashkilot
-
+from users.models import CustomUser
 
 # Create your models here.
 # 5. COMPLAINTS (Asosiy o'zgarish shu yerda)
@@ -25,14 +25,13 @@ class Complaint(models.Model):
     region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True, verbose_name="Viloyat")
     district = models.ForeignKey(District, on_delete=models.SET_NULL, null=True, verbose_name="Tuman")
     
-    # --- POINTFIELD ---
-    # srid=4326 bu GPS koordinatalari (WGS 84) standarti
-    location = models.PointField(srid=4326, blank=True, null=True, verbose_name="Lokatsiya")
+    # --- LOCATION FIELD ---
+    location = models.PointField(srid=4326,blank=True, null=True, verbose_name="Lokatsiya")
     
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='new', verbose_name="Holat")
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='complaints', verbose_name="Foydalanuvchi")
     masul_tashkilot = models.ForeignKey(Tashkilot, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Mas'ul tashkilot")
-    priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='medium', verbose_name="Muhimlik")
+    priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, null=True, blank=True, default=None, verbose_name="Muhimlik")
     answer_text = models.TextField(blank=True, null=True, verbose_name="Javob matni")
     
     created_at = models.DateTimeField(auto_now_add=True)

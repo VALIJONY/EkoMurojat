@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+
+{% block title %}Yangi foydalanuvchi - Admin{% endblock %}
+
+{% block extra_head %}
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-3xl">
+    
+    <!-- Page Header -->
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-3">
+                {% if object %}
+                    <i class="ri-user-settings-line text-blue-600"></i>
+                    Foydalanuvchini tahrirlash
+                {% else %}
+                    <i class="ri-user-add-line text-emerald-600"></i>
+                    Yangi foydalanuvchi yaratish
+                {% endif %}
+            </h1>
+            <p class="text-slate-500 mt-1 ml-1">
+                {% if object %}
+                    Mavjud foydalanuvchi ma'lumotlarini yangilash
+                {% else %}
+                    Tashkilot uchun yangi foydalanuvchi akkaunti
+                {% endif %}
+            </p>
+        </div>
+        <a href="{% url 'users_admin' %}" class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 transition shadow-sm font-medium">
+            <i class="ri-arrow-left-line"></i> Orqaga
+        </a>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+        
+        <!-- Top Colored Line -->
+        <div class="h-1.5 w-full bg-gradient-to-r from-emerald-500 to-green-400"></div>
+
+        <form method="post" class="p-8 space-y-8">
+            {% csrf_token %}
+            
+            <!-- Section 1: Asosiy ma'lumotlar -->
+            <div>
+                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <i class="ri-user-line"></i> Shaxsiy ma'lumotlar
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Username -->
+                    <div class="group">
+                        <label for="{{ form.username.id_for_label }}" class="block text-sm font-bold text-slate-700 mb-2">Username <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <i class="ri-user-3-line absolute left-4 top-3.5 text-slate-400 z-10"></i>
+                            {{ form.username }}
+                        </div>
+                        {% if form.username.errors %}
+                            <p class="text-red-500 text-sm mt-1">{{ form.username.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Email -->
+                    <div class="group">
+                        <label for="{{ form.email.id_for_label }}" class="block text-sm font-bold text-slate-700 mb-2">Email <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <i class="ri-mail-line absolute left-4 top-3.5 text-slate-400 z-10"></i>
+                            {{ form.email }}
+                        </div>
+                        {% if form.email.errors %}
+                            <p class="text-red-500 text-sm mt-1">{{ form.email.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- First Name -->
+                    <div class="group">
+                        <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-bold text-slate-700 mb-2">Ism</label>
+                        <div class="relative">
+                            <i class="ri-user-smile-line absolute left-4 top-3.5 text-slate-400 z-10"></i>
+                            {{ form.first_name }}
+                        </div>
+                        {% if form.first_name.errors %}
+                            <p class="text-red-500 text-sm mt-1">{{ form.first_name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Last Name -->
+                    <div class="group">
+                        <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-bold text-slate-700 mb-2">Familiya</label>
+                        <div class="relative">
+                            <i class="ri-user-line absolute left-4 top-3.5 text-slate-400 z-10"></i>
+                            {{ form.last_name }}
+                        </div>
+                        {% if form.last_name.errors %}
+                            <p class="text-red-500 text-sm mt-1">{{ form.last_name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-slate-100">
+
+            <!-- Section 2: Parol -->
+            <div>
+                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <i class="ri-lock-password-line"></i> Xavfsizlik
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Password -->
+                    <div class="group">
+                        <label for="{{ form.password.id_for_label }}" class="block text-sm font-bold text-slate-700 mb-2">Parol <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <i class="ri-lock-line absolute left-4 top-3.5 text-slate-400 z-10"></i>
+                            {{ form.password }}
+                        </div>
+                        {% if form.password.errors %}
+                            <p class="text-red-500 text-sm mt-1">{{ form.password.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Password Confirm -->
+                    <div class="group">
+                        <label for="{{ form.password_confirm.id_for_label }}" class="block text-sm font-bold text-slate-700 mb-2">Parolni tasdiqlang <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <i class="ri-lock-2-line absolute left-4 top-3.5 text-slate-400 z-10"></i>
+                            {{ form.password_confirm }}
+                        </div>
+                        {% if form.password_confirm.errors %}
+                            <p class="text-red-500 text-sm mt-1">{{ form.password_confirm.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-slate-100">
+
+            <!-- Section 3: Rol va Tashkilot -->
+            <div>
+                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <i class="ri-user-star-line"></i> Rol va Tashkilotga biriktirish
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Role -->
+                    <div class="group">
+                        <label for="{{ form.role.id_for_label }}" class="block text-sm font-bold text-slate-700 mb-2">Rol <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <i class="ri-user-settings-line absolute left-4 top-3.5 text-slate-400 z-10"></i>
+                            {{ form.role }}
+                        </div>
+                        <p class="text-xs text-slate-400 mt-2">Foydalanuvchi uchun mos rol tanlang.</p>
+                        {% if form.role.errors %}
+                            <p class="text-red-500 text-sm mt-1">{{ form.role.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Organization -->
+                    <div class="group">
+                        <label for="{{ form.organization.id_for_label }}" class="block text-sm font-bold text-slate-700 mb-2">Tashkilot</label>
+                        <div class="relative">
+                            <i class="ri-building-line absolute left-4 top-3.5 text-slate-400 z-10"></i>
+                            {{ form.organization }}
+                        </div>
+                        <p class="text-xs text-slate-400 mt-2">Foydalanuvchini tashkilotga biriktiring (ixtiyoriy).</p>
+                        {% if form.organization.errors %}
+                            <p class="text-red-500 text-sm mt-1">{{ form.organization.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center justify-end gap-3 pt-4">
+                <a href="{% url 'users_admin' %}" class="px-6 py-3 text-slate-600 font-medium hover:bg-slate-50 rounded-xl transition-colors">
+                    Bekor qilish
+                </a>
+                <button type="submit" class="px-8 py-3 
+                    {% if object %}bg-blue-600 hover:bg-blue-700 shadow-blue-200{% else %}bg-emerald-600 hover:bg-emerald-700 shadow-emerald-200{% endif %} 
+                    text-white font-bold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center gap-2">
+                    <i class="{% if object %}ri-user-settings-line{% else %}ri-user-add-line{% endif %} text-lg"></i> 
+                    {% if object %}Foydalanuvchini yangilash{% else %}Foydalanuvchi yaratish{% endif %}
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<!-- Auto-Styling Script for Django Forms -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Input va Selectlarga Tailwind klasslarini qo'shish
+        const styleInputs = (selector, isTextarea = false) => {
+            document.querySelectorAll(selector).forEach(el => {
+                // Asosiy stillar
+                el.classList.add(
+                    'w-full', 'bg-slate-50', 'text-slate-800', 'font-medium', 
+                    'border', 'border-slate-200', 'rounded-xl', 
+                    'focus:ring-4', 'focus:ring-emerald-500/20', 'focus:border-emerald-500', 
+                    'transition-all', 'outline-none'
+                );
+                
+                // Textarea uchun
+                if (isTextarea) {
+                    el.classList.add('p-4', 'min-h-[150px]');
+                } else {
+                    // Select va Input uchun (padding-left ikonka uchun)
+                    el.classList.add('pl-12', 'pr-4', 'py-3');
+                }
+            });
+        };
+
+        styleInputs('select');
+        styleInputs('input[type="text"]');
+        styleInputs('input[type="email"]');
+        styleInputs('input[type="password"]');
+        styleInputs('textarea', true);
+        
+        // Select elementlarining o'ng tomonidagi strelkani to'g'irlash
+        document.querySelectorAll('select').forEach(el => {
+            el.style.backgroundImage = `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`;
+            el.style.backgroundPosition = `right 0.5rem center`;
+            el.style.backgroundRepeat = `no-repeat`;
+            el.style.backgroundSize = `1.5em 1.5em`;
+            el.classList.add('appearance-none'); // Brauzerning standart strelkasini o'chirish
+        });
+    });
+</script>
+{% endblock %}

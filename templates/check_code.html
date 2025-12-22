@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kodni tasdiqlash | Ekomurojaat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --accent: #00e676;
+            --bg-gradient: linear-gradient(135deg, #134e5e 0%, #71b280 100%);
+            --glass: rgba(255, 255, 255, 0.92);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', sans-serif;
+            background: var(--bg-gradient);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .container {
+            background: var(--glass);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            backdrop-filter: blur(10px);
+            border-top: 4px solid var(--accent);
+        }
+
+        h2 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 15px;
+            font-size: 24px;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            outline: none;
+            letter-spacing: 5px;
+            transition: 0.3s;
+            box-sizing: border-box; 
+            /* Raqamlarni ko'paytirgich (spinner) ni yo'qotish */
+            -moz-appearance: textfield;
+        }
+        
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(46, 125, 50, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(to right, var(--primary), #1b5e20);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(46, 125, 50, 0.3);
+        }
+
+        .error-msg {
+            color: #d32f2f;
+            background: #ffebee;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            border: 1px solid #ef9a9a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Tasdiqlash</h2>
+        <p>Iltimos, emailingizga yuborilgan 6 xonali kodni kiriting.</p>
+
+        {% if error %}
+            <div class="error-msg">⚠️ {{ error }}</div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <input type="number" name="code" placeholder="123456" required autofocus maxlength="6" oninput="if(this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);">
+            <button type="submit">Tasdiqlash</button>
+        </form>
+    </div>
+</body>
+</html>

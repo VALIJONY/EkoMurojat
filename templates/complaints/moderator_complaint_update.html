@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}Murojaatni hal etish - Moderator{% endblock %}
+
+{% block extra_head %}
+<!-- Remix Icon -->
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-3xl">
+    
+    <!-- Page Header -->
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-3">
+                <i class="ri-customer-service-2-line text-emerald-600"></i>
+                Murojaatni hal etish
+            </h1>
+            <p class="text-slate-500 mt-1 ml-1">ID: #{{ object.pk }} | {{ object.title|truncatechars:40 }}</p>
+        </div>
+        <a href="{% url 'complaint_detail_moderator' object.pk %}" class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 transition shadow-sm font-medium">
+            <i class="ri-arrow-left-line"></i> Orqaga
+        </a>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+        
+        <!-- Top Gradient Line -->
+        <div class="h-1.5 w-full bg-gradient-to-r from-emerald-500 via-teal-500 to-blue-500"></div>
+
+        <form method="post" class="p-8 space-y-8">
+            {% csrf_token %}
+            
+            <!-- Info Alert -->
+            <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-start gap-3">
+                <i class="ri-information-fill text-blue-500 text-xl mt-0.5"></i>
+                <div>
+                    <h4 class="font-bold text-blue-900 text-sm">Moderator eslatmasi</h4>
+                    <p class="text-sm text-blue-700 mt-1">
+                        Siz murojaat holatini o'zgartirishingiz va fuqaroga rasmiy javob yo'llashingiz mumkin. 
+                        Javob matni aniq, lo'nda va rasmiy uslubda bo'lishi tavsiya etiladi.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Status Section -->
+            <div class="group">
+                <label for="{{ form.status.id_for_label }}" class="block text-sm font-bold text-slate-700 mb-2">
+                    Yangi holatni tanlang <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                    <i class="ri-checkbox-circle-line absolute left-4 top-3.5 text-slate-400 z-10 text-lg"></i>
+                    {{ form.status }}
+                </div>
+                <p class="text-xs text-slate-400 mt-2 flex items-center gap-1">
+                    <i class="ri-git-commit-line"></i>
+                    Siz faqat "Jarayonda" yoki "Yopilgan" (Hal etilgan) holatlarini belgilashingiz mumkin.
+                </p>
+                {% if form.status.errors %}
+                    <p class="text-red-500 text-sm mt-1 flex items-center gap-1"><i class="ri-error-warning-line"></i> {{ form.status.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <hr class="border-slate-100">
+
+            <!-- Answer Section -->
+            <div class="group">
+                <label for="{{ form.answer_text.id_for_label }}" class="block text-sm font-bold text-slate-700 mb-2">
+                    Javob matni (Yechim)
+                </label>
+                
+                <div class="relative">
+                    <!-- Icon for textarea is tricky, so we put it outside or use padding -->
+                    {{ form.answer_text }}
+                    
+                    <!-- Textarea footer decoration -->
+                    <div class="absolute bottom-3 right-3 text-slate-300 pointer-events-none">
+                        <i class="ri-pencil-ruler-2-line text-xl"></i>
+                    </div>
+                </div>
+
+                <p class="text-xs text-slate-500 mt-2 flex items-center gap-1">
+                    <i class="ri-shield-check-line text-emerald-500"></i>
+                    Ushbu javob fuqaroning shaxsiy kabinetida ko'rinadi.
+                </p>
+
+                {% if form.answer_text.errors %}
+                    <p class="text-red-500 text-sm mt-1 flex items-center gap-1"><i class="ri-error-warning-line"></i> {{ form.answer_text.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-50">
+                <a href="{% url 'complaint_detail_moderator' object.pk %}" class="px-6 py-3 text-slate-600 font-medium hover:bg-slate-50 rounded-xl transition-colors">
+                    Bekor qilish
+                </a>
+                <button type="submit" class="px-8 py-3 bg-emerald-600 text-white font-bold rounded-xl shadow-lg shadow-emerald-200 hover:bg-emerald-700 hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center gap-2">
+                    <i class="ri-send-plane-fill text-lg"></i> Javobni yuborish
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<!-- Auto-Styling Script for Django Forms -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Select Input Style
+        const select = document.querySelector('select');
+        if (select) {
+            select.classList.add(
+                'w-full', 'bg-slate-50', 'text-slate-800', 'font-medium', 
+                'border', 'border-slate-200', 'rounded-xl', 
+                'pl-12', 'pr-4', 'py-3', 
+                'focus:ring-4', 'focus:ring-emerald-500/20', 'focus:border-emerald-500', 
+                'transition-all', 'outline-none', 'appearance-none'
+            );
+            // Custom Arrow
+            select.style.backgroundImage = `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`;
+            select.style.backgroundPosition = `right 0.5rem center`;
+            select.style.backgroundRepeat = `no-repeat`;
+            select.style.backgroundSize = `1.5em 1.5em`;
+        }
+
+        // Textarea Style
+        const textarea = document.querySelector('textarea');
+        if (textarea) {
+            textarea.classList.add(
+                'w-full', 'bg-slate-50', 'text-slate-800', 'font-medium', 
+                'border', 'border-slate-200', 'rounded-xl', 
+                'p-5', 'min-h-[200px]', // Katta maydon
+                'focus:ring-4', 'focus:ring-emerald-500/20', 'focus:border-emerald-500', 
+                'transition-all', 'outline-none', 'resize-y'
+            );
+            textarea.placeholder = "Assalomu alaykum! Sizning murojaatingiz o'rganib chiqildi va...";
+        }
+    });
+</script>
+{% endblock %}

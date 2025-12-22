@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+
+{% block title %}Prioritet Boshqaruvi - EkoMurojat{% endblock %}
+
+{% block extra_head %}
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-7xl">
+    
+    <!-- Page Header -->
+    <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-3">
+                <i class="ri-equalizer-line text-emerald-600"></i>
+                Prioritet Boshqaruvi
+            </h1>
+            <p class="text-slate-500 mt-1">Murojaatlarni muhimlik darajasi bo'yicha saralash va boshqarish</p>
+        </div>
+        <a href="{% url 'dashboard_admin' %}" class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 transition shadow-sm font-medium">
+            <i class="ri-arrow-left-line"></i> Dashboardga qaytish
+        </a>
+    </div>
+
+    <!-- FILTERS GRID -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        
+        <!-- Null (Belgilanmagan) -->
+        <a href="?priority=null" class="relative overflow-hidden p-5 rounded-2xl border transition-all duration-200 group
+            {% if selected_priority == 'null' %} bg-slate-800 border-slate-800 text-white shadow-lg shadow-slate-200
+            {% else %} bg-white border-slate-200 hover:border-slate-300 hover:shadow-md {% endif %}">
+            <div class="flex justify-between items-start z-10 relative">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-wider opacity-70">Belgilanmagan</p>
+                    <h3 class="text-2xl font-bold mt-1">{{ null_priority_count }}</h3>
+                </div>
+                <div class="text-2xl opacity-80"><i class="ri-question-mark"></i></div>
+            </div>
+        </a>
+
+        <!-- Low (Past) -->
+        <a href="?priority=low" class="relative overflow-hidden p-5 rounded-2xl border transition-all duration-200 group
+            {% if selected_priority == 'low' %} bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-200
+            {% else %} bg-white border-slate-200 hover:border-emerald-200 hover:shadow-md {% endif %}">
+            <div class="flex justify-between items-start z-10 relative">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-wider opacity-70">Past</p>
+                    <h3 class="text-2xl font-bold mt-1 {% if selected_priority != 'low' %}text-emerald-600{% endif %}">{{ low_priority_count }}</h3>
+                </div>
+                <div class="text-2xl opacity-80 {% if selected_priority != 'low' %}text-emerald-500{% endif %}"><i class="ri-flag-line"></i></div>
+            </div>
+        </a>
+
+        <!-- Medium (O'rta) -->
+        <a href="?priority=medium" class="relative overflow-hidden p-5 rounded-2xl border transition-all duration-200 group
+            {% if selected_priority == 'medium' %} bg-amber-500 border-amber-500 text-white shadow-lg shadow-amber-200
+            {% else %} bg-white border-slate-200 hover:border-amber-200 hover:shadow-md {% endif %}">
+            <div class="flex justify-between items-start z-10 relative">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-wider opacity-70">O'rta</p>
+                    <h3 class="text-2xl font-bold mt-1 {% if selected_priority != 'medium' %}text-amber-500{% endif %}">{{ medium_priority_count }}</h3>
+                </div>
+                <div class="text-2xl opacity-80 {% if selected_priority != 'medium' %}text-amber-400{% endif %}"><i class="ri-alert-line"></i></div>
+            </div>
+        </a>
+
+        <!-- High (Yuqori) -->
+        <a href="?priority=high" class="relative overflow-hidden p-5 rounded-2xl border transition-all duration-200 group
+            {% if selected_priority == 'high' %} bg-red-500 border-red-500 text-white shadow-lg shadow-red-200
+            {% else %} bg-white border-slate-200 hover:border-red-200 hover:shadow-md {% endif %}">
+            <div class="flex justify-between items-start z-10 relative">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-wider opacity-70">Yuqori</p>
+                    <h3 class="text-2xl font-bold mt-1 {% if selected_priority != 'high' %}text-red-500{% endif %}">{{ high_priority_count }}</h3>
+                </div>
+                <div class="text-2xl opacity-80 {% if selected_priority != 'high' %}text-red-400{% endif %}"><i class="ri-alarm-warning-line"></i></div>
+            </div>
+        </a>
+    </div>
+
+    {% if complaints %}
+        <!-- COMPLAINTS LIST -->
+        <div class="grid gap-6">
+            {% for complaint in complaints %}
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
+                    
+                    <div class="flex flex-col md:flex-row">
+                        <!-- Left: Info -->
+                        <div class="p-6 flex-1">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="text-lg font-bold text-slate-800">{{ complaint.title }}</h3>
+                                <span class="px-2.5 py-1 rounded-full text-xs font-bold border uppercase tracking-wide
+                                    {% if complaint.status == 'new' %} bg-blue-50 text-blue-600 border-blue-100
+                                    {% elif complaint.status == 'in_progress' %} bg-orange-50 text-orange-600 border-orange-100
+                                    {% elif complaint.status == 'closed' %} bg-emerald-50 text-emerald-600 border-emerald-100
+                                    {% elif complaint.status == 'rejected' %} bg-red-50 text-red-600 border-red-100 {% endif %}">
+                                    {{ complaint.get_status_display }}
+                                </span>
+                            </div>
+                            
+                            <p class="text-slate-600 mb-4 line-clamp-2">{{ complaint.description }}</p>
+                            
+                            <div class="flex flex-wrap gap-4 text-sm text-slate-500">
+                                <span class="flex items-center gap-1"><i class="ri-user-smile-line"></i> {{ complaint.user.username }}</span>
+                                <span class="flex items-center gap-1"><i class="ri-map-pin-line"></i> {{ complaint.region.name }}</span>
+                                <span class="flex items-center gap-1"><i class="ri-calendar-line"></i> {{ complaint.created_at|date:"d.m.Y" }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Right: Action Bar (Priority Controls) -->
+                        <div class="bg-slate-50 border-t md:border-t-0 md:border-l border-slate-100 p-6 md:w-80 flex flex-col justify-center gap-4">
+                            
+                            <!-- Current State -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-400 uppercase">Hozirgi holat</span>
+                                {% if complaint.priority == 'high' %}
+                                    <span class="flex items-center gap-1 text-red-600 font-bold text-sm"><i class="ri-alarm-warning-fill"></i> Yuqori</span>
+                                {% elif complaint.priority == 'medium' %}
+                                    <span class="flex items-center gap-1 text-amber-500 font-bold text-sm"><i class="ri-alert-fill"></i> O'rta</span>
+                                {% elif complaint.priority == 'low' %}
+                                    <span class="flex items-center gap-1 text-emerald-600 font-bold text-sm"><i class="ri-flag-fill"></i> Past</span>
+                                {% else %}
+                                    <span class="flex items-center gap-1 text-slate-400 font-bold text-sm"><i class="ri-question-fill"></i> Yo'q</span>
+                                {% endif %}
+                            </div>
+
+                            <!-- Buttons -->
+                            <form method="post" class="grid grid-cols-3 gap-2">
+                                {% csrf_token %}
+                                <input type="hidden" name="complaint_id" value="{{ complaint.id }}">
+                                
+                                <button type="submit" name="priority" value="low" class="flex flex-col items-center justify-center p-2 rounded-xl border border-slate-200 bg-white text-emerald-600 hover:bg-emerald-50 hover:border-emerald-200 transition-all group" title="Past prioritet">
+                                    <i class="ri-flag-line text-xl mb-1 group-hover:scale-110 transition-transform"></i>
+                                    <span class="text-[10px] font-bold uppercase">Past</span>
+                                </button>
+                                
+                                <button type="submit" name="priority" value="medium" class="flex flex-col items-center justify-center p-2 rounded-xl border border-slate-200 bg-white text-amber-500 hover:bg-amber-50 hover:border-amber-200 transition-all group" title="O'rta prioritet">
+                                    <i class="ri-alert-line text-xl mb-1 group-hover:scale-110 transition-transform"></i>
+                                    <span class="text-[10px] font-bold uppercase">O'rta</span>
+                                </button>
+                                
+                                <button type="submit" name="priority" value="high" class="flex flex-col items-center justify-center p-2 rounded-xl border border-slate-200 bg-white text-red-500 hover:bg-red-50 hover:border-red-200 transition-all group" title="Yuqori prioritet">
+                                    <i class="ri-alarm-warning-line text-xl mb-1 group-hover:scale-110 transition-transform"></i>
+                                    <span class="text-[10px] font-bold uppercase">Yuqori</span>
+                                </button>
+                            </form>
+                            
+                            <!-- View Button -->
+                            <a href="{% url 'complaint_detail_admin' complaint.pk %}" class="w-full text-center py-2 text-sm text-slate-500 hover:text-emerald-600 font-medium transition-colors border-t border-slate-200 pt-3 mt-1">
+                                Batafsil ko'rish
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="flex justify-center mt-10">
+            <nav class="inline-flex rounded-xl shadow-sm bg-white border border-slate-200 p-1 space-x-1">
+                {% if page_obj.has_previous %}
+                    <a href="?priority={{ selected_priority }}&page={{ page_obj.previous_page_number }}" class="px-3 py-2 rounded-lg text-slate-500 hover:bg-slate-50 hover:text-emerald-600 transition-colors">
+                        <i class="ri-arrow-left-s-line"></i>
+                    </a>
+                {% endif %}
+
+                <span class="px-4 py-2 rounded-lg bg-emerald-600 text-white font-medium shadow-md">
+                    {{ page_obj.number }}
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?priority={{ selected_priority }}&page={{ page_obj.next_page_number }}" class="px-3 py-2 rounded-lg text-slate-500 hover:bg-slate-50 hover:text-emerald-600 transition-colors">
+                        <i class="ri-arrow-right-s-line"></i>
+                    </a>
+                {% endif %}
+            </nav>
+        </div>
+        {% endif %}
+
+    {% else %}
+        <!-- Empty State -->
+        <div class="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-slate-300 text-center">
+            <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-6 text-slate-400 text-4xl">
+                <i class="ri-filter-off-line"></i>
+            </div>
+            <h2 class="text-xl font-bold text-slate-800 mb-2">Murojaatlar topilmadi</h2>
+            <p class="text-slate-500 max-w-sm">Ushbu prioritet bo'yicha hozircha hech qanday murojaat mavjud emas.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

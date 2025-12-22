@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+
+{% block title %}Barcha murojaatlar - Admin{% endblock %}
+
+{% block extra_head %}
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-[1400px]">
+    
+    <!-- Page Header -->
+    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-3">
+                <i class="ri-file-list-3-line text-emerald-600"></i>
+                Barcha murojaatlar
+            </h1>
+            <p class="text-slate-500 mt-1 ml-1">Tizimga kelib tushgan barcha arizalar ro'yxati</p>
+        </div>
+        <a href="{% url 'dashboard_admin' %}" class="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 transition shadow-sm font-medium">
+            <i class="ri-arrow-left-line"></i> Dashboard
+        </a>
+    </div>
+
+    <!-- FILTER SECTION -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 mb-8">
+        <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+            <i class="ri-filter-3-line"></i> Filtrlash
+        </h3>
+        
+        <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            <!-- Status Filter -->
+            <div class="group">
+                <label class="block text-xs font-bold text-slate-500 mb-1.5 ml-1">Holat</label>
+                <div class="relative">
+                    <i class="ri-checkbox-circle-line absolute left-3 top-2.5 text-slate-400 pointer-events-none"></i>
+                    <select name="status" class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 font-medium focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none appearance-none cursor-pointer hover:bg-white">
+                        <option value="">Barchasi</option>
+                        <option value="new" {% if selected_status == 'new' %}selected{% endif %}>Yangi</option>
+                        <option value="in_progress" {% if selected_status == 'in_progress' %}selected{% endif %}>Jarayonda</option>
+                        <option value="closed" {% if selected_status == 'closed' %}selected{% endif %}>Yopilgan</option>
+                        <option value="rejected" {% if selected_status == 'rejected' %}selected{% endif %}>Rad etilgan</option>
+                    </select>
+                    <!-- Custom Arrow -->
+                    <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-slate-400">
+                        <i class="ri-arrow-down-s-line"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Priority Filter -->
+            <div class="group">
+                <label class="block text-xs font-bold text-slate-500 mb-1.5 ml-1">Muhimlik</label>
+                <div class="relative">
+                    <i class="ri-flag-line absolute left-3 top-2.5 text-slate-400 pointer-events-none"></i>
+                    <select name="priority" class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 font-medium focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none appearance-none cursor-pointer hover:bg-white">
+                        <option value="">Barchasi</option>
+                        <option value="high" {% if selected_priority == 'high' %}selected{% endif %}>Yuqori</option>
+                        <option value="medium" {% if selected_priority == 'medium' %}selected{% endif %}>O'rta</option>
+                        <option value="low" {% if selected_priority == 'low' %}selected{% endif %}>Past</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-slate-400">
+                        <i class="ri-arrow-down-s-line"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Region Filter -->
+            <div class="group">
+                <label class="block text-xs font-bold text-slate-500 mb-1.5 ml-1">Viloyat</label>
+                <div class="relative">
+                    <i class="ri-map-pin-line absolute left-3 top-2.5 text-slate-400 pointer-events-none"></i>
+                    <select name="region" class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 font-medium focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all outline-none appearance-none cursor-pointer hover:bg-white">
+                        <option value="">Barchasi</option>
+                        {% for region in regions %}
+                        <option value="{{ region.id }}" {% if selected_region == region.id|stringformat:"s" %}selected{% endif %}>{{ region.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-slate-400">
+                        <i class="ri-arrow-down-s-line"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex gap-2">
+                <button type="submit" class="flex-1 bg-emerald-600 text-white font-bold py-2.5 px-4 rounded-xl shadow-md shadow-emerald-200 hover:bg-emerald-700 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
+                    <i class="ri-search-2-line"></i> Izlash
+                </button>
+                <a href="{% url 'complaints_admin' %}" class="px-4 py-2.5 border border-slate-200 text-slate-500 rounded-xl hover:bg-slate-50 hover:text-slate-700 transition-colors flex items-center justify-center" title="Filtrni tozalash">
+                    <i class="ri-refresh-line text-xl"></i>
+                </a>
+            </div>
+        </form>
+    </div>
+
+    {% if complaints %}
+        <!-- TABLE -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-8">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-100">
+                            <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">ID</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Murojaat</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Foydalanuvchi / Hudud</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Holat / Muhimlik</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Sana</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Amallar</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for complaint in complaints %}
+                        <tr class="hover:bg-slate-50/80 transition-colors group">
+                            <!-- ID -->
+                            <td class="px-6 py-4 text-slate-400 font-mono text-xs">
+                                #{{ complaint.id }}
+                            </td>
+                            
+                            <!-- Title -->
+                            <td class="px-6 py-4">
+                                <a href="{% url 'complaint_detail_admin' complaint.pk %}" class="block font-bold text-slate-800 hover:text-emerald-600 transition-colors mb-1">
+                                    {{ complaint.title|truncatechars:40 }}
+                                </a>
+                                <p class="text-xs text-slate-500 truncate max-w-[200px]">{{ complaint.description }}</p>
+                            </td>
+
+                            <!-- User & Region -->
+                            <td class="px-6 py-4">
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex items-center gap-1.5 text-sm font-medium text-slate-700">
+                                        <i class="ri-user-smile-line text-slate-400"></i> {{ complaint.user.username }}
+                                    </div>
+                                    <div class="flex items-center gap-1.5 text-xs text-slate-500">
+                                        <i class="ri-map-pin-line"></i> {{ complaint.region.name }}
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Status & Priority -->
+                            <td class="px-6 py-4">
+                                <div class="flex flex-col gap-2 items-start">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-bold border
+                                        {% if complaint.status == 'new' %} bg-blue-50 text-blue-600 border-blue-100
+                                        {% elif complaint.status == 'in_progress' %} bg-orange-50 text-orange-600 border-orange-100
+                                        {% elif complaint.status == 'closed' %} bg-emerald-50 text-emerald-600 border-emerald-100
+                                        {% elif complaint.status == 'rejected' %} bg-red-50 text-red-600 border-red-100 {% endif %}">
+                                        {{ complaint.get_status_display }}
+                                    </span>
+                                    
+                                    <span class="flex items-center gap-1 text-xs font-semibold
+                                        {% if complaint.priority == 'high' %} text-red-500
+                                        {% elif complaint.priority == 'medium' %} text-amber-500
+                                        {% else %} text-emerald-600 {% endif %}">
+                                        {% if complaint.priority == 'high' %} <i class="ri-alarm-warning-fill"></i>
+                                        {% elif complaint.priority == 'medium' %} <i class="ri-alert-fill"></i>
+                                        {% else %} <i class="ri-flag-fill"></i> {% endif %}
+                                        {{ complaint.get_priority_display }}
+                                    </span>
+                                </div>
+                            </td>
+
+                            <!-- Date -->
+                            <td class="px-6 py-4 text-sm text-slate-500 font-mono">
+                                {{ complaint.created_at|date:"d.m.Y" }}
+                            </td>
+
+                            <!-- Actions -->
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <a href="{% url 'complaint_detail_admin' complaint.pk %}" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition-all" title="Ko'rish">
+                                        <i class="ri-eye-line text-lg"></i>
+                                    </a>
+                                    <a href="{% url 'complaint_update_admin' complaint.pk %}" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all" title="Tahrirlash">
+                                        <i class="ri-edit-box-line text-lg"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="flex justify-center">
+            <nav class="inline-flex rounded-xl shadow-sm bg-white border border-slate-200 p-1 space-x-1">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_priority %}&priority={{ selected_priority }}{% endif %}{% if selected_region %}&region={{ selected_region }}{% endif %}" 
+                       class="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-50 hover:text-emerald-600 transition-colors">
+                        <i class="ri-arrow-left-double-line"></i>
+                    </a>
+                    <a href="?page={{ page_obj.previous_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_priority %}&priority={{ selected_priority }}{% endif %}{% if selected_region %}&region={{ selected_region }}{% endif %}" 
+                       class="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-50 hover:text-emerald-600 transition-colors">
+                        <i class="ri-arrow-left-s-line"></i>
+                    </a>
+                {% endif %}
+
+                <span class="px-4 h-9 flex items-center justify-center rounded-lg bg-emerald-600 text-white font-medium shadow-md">
+                    {{ page_obj.number }}
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_priority %}&priority={{ selected_priority }}{% endif %}{% if selected_region %}&region={{ selected_region }}{% endif %}" 
+                       class="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-50 hover:text-emerald-600 transition-colors">
+                        <i class="ri-arrow-right-s-line"></i>
+                    </a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_priority %}&priority={{ selected_priority }}{% endif %}{% if selected_region %}&region={{ selected_region }}{% endif %}" 
+                       class="w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-50 hover:text-emerald-600 transition-colors">
+                        <i class="ri-arrow-right-double-line"></i>
+                    </a>
+                {% endif %}
+            </nav>
+        </div>
+        {% endif %}
+
+    {% else %}
+        <!-- Empty State -->
+        <div class="flex flex-col items-center justify-center py-24 bg-white rounded-3xl border border-dashed border-slate-300 text-center">
+            <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-6 text-slate-300 text-5xl">
+                <i class="ri-search-eye-line"></i>
+            </div>
+            <h2 class="text-xl font-bold text-slate-800 mb-2">Murojaatlar topilmadi</h2>
+            <p class="text-slate-500 max-w-sm mb-6">Siz tanlagan filtrlar bo'yicha hech qanday ma'lumot yo'q yoki tizimda arizalar mavjud emas.</p>
+            <a href="{% url 'complaints_admin' %}" class="px-6 py-2 bg-white border border-slate-200 text-slate-600 font-medium rounded-xl hover:bg-slate-50 transition">
+                Filtrlarni tozalash
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

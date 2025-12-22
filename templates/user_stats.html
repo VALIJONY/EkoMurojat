@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | EkoMurojaat</title>
+    
+    <!-- Fontlar -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Ikonkalar -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary: #2e7d32;       /* Asosiy yashil */
+            --primary-dark: #1b5e20;  /* To'q yashil */
+            --accent: #00e676;        /* Yorqin yashil */
+            --bg-body: #f1f8e9;       /* Juda och yashil fon */
+            --glass: rgba(255, 255, 255, 0.95);
+            --text-main: #2c3e50;
+            --text-light: #546e7a;
+            --danger: #e53935;        /* Logout uchun qizil */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-body);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(46, 125, 50, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 230, 118, 0.05) 0%, transparent 40%);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 2px solid rgba(46, 125, 50, 0.1);
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-profile {
+            background-color: #e8f5e9;
+            color: var(--primary-dark);
+        }
+        .btn-profile:hover {
+            background-color: #c8e6c9;
+            transform: translateY(-2px);
+        }
+
+        .btn-logout {
+            background-color: #ffebee;
+            color: var(--danger);
+        }
+        .btn-logout:hover {
+            background-color: #ffcdd2;
+            transform: translateY(-2px);
+        }
+
+        /* --- CONTAINER --- */
+        .container {
+            max-width: 1400px; /* Katta format */
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            color: var(--text-main);
+            margin-bottom: 25px;
+            font-weight: 800;
+            padding-left: 10px;
+            border-left: 5px solid var(--accent);
+        }
+
+        /* --- STATS GRID (4 cards) --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(0,0,0,0.02);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+        }
+
+        .stat-content h3 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 0;
+            line-height: 1.2;
+            color: var(--text-main);
+        }
+
+        .stat-content p {
+            color: var(--text-light);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+
+        /* Card Colors */
+        .bg-blue { background: #e3f2fd; color: #1565c0; }
+        .bg-green { background: #e8f5e9; color: #2e7d32; }
+        .bg-yellow { background: #fffde7; color: #f9a825; }
+        .bg-red { background: #ffebee; color: #c62828; }
+
+        /* --- MAIN CONTENT (Chart & Table) --- */
+        .content-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 2fr; /* Diagramma kichikroq, jadval kattaroq */
+            gap: 30px;
+        }
+
+        .dashboard-box {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+        }
+
+        .box-header {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--primary-dark);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead tr {
+            background-color: #f8faf8;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        th {
+            text-align: left;
+            padding: 15px;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.95rem;
+        }
+
+        tr:hover td {
+            background-color: #fcfdfc;
+        }
+
+        /* Status Badges */
+        .badge {
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: inline-block;
+        }
+        .badge-new { background: #e3f2fd; color: #1565c0; }
+        .badge-progress { background: #fff3e0; color: #ef6c00; }
+        .badge-closed { background: #e8f5e9; color: #2e7d32; }
+        .badge-rejected { background: #ffebee; color: #c62828; }
+
+        /* Mobile */
+        @media (max-width: 900px) {
+            .content-wrapper {
+                grid-template-columns: 1fr;
+            }
+            .navbar {
+                padding: 15px;
+            }
+            .brand span {
+                display: none; /* Telefonda faqat logotip qolsin */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <a href="/" class="brand">
+            <i class="fas fa-leaf"></i>
+            <span>EkoMurojaat</span>
+        </a>
+        <div class="nav-actions">
+            <!-- Profile tugmasi: O'zingizning profile url'ingizni qo'ying -->
+            <a href="#" class="btn btn-profile">
+                <i class="fas fa-user-circle"></i> Profil
+            </a>
+            <!-- Chiqish tugmasi: logout url ni qo'ying -->
+            <a href="{% url 'logout' %}" class="btn btn-logout">
+                <i class="fas fa-sign-out-alt"></i> Chiqish
+            </a>
+        </div>
+    </nav>
+
+    <!-- DASHBOARD CONTENT -->
+    <div class="container">
+        <h1 class="page-title">Mening Statistikam</h1>
+
+        <!-- 1. STATS CARDS -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-content">
+                    <h3>{{ total_count|default:0 }}</h3>
+                    <p>Jami arizalar</p>
+                </div>
+                <div class="stat-icon bg-blue"><i class="fas fa-folder-open"></i></div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-content">
+                    <h3>{{ closed_count|default:0 }}</h3>
+                    <p>Hal etilgan</p>
+                </div>
+                <div class="stat-icon bg-green"><i class="fas fa-check"></i></div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-content">
+                    <h3>{{ in_progress_count|default:0 }}</h3>
+                    <p>Jarayonda</p>
+                </div>
+                <div class="stat-icon bg-yellow"><i class="fas fa-sync-alt"></i></div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-content">
+                    <h3>{{ rejected_count|default:0 }}</h3>
+                    <p>Rad etilgan</p>
+                </div>
+                <div class="stat-icon bg-red"><i class="fas fa-times"></i></div>
+            </div>
+        </div>
+
+        <!-- 2. MAIN SECTION -->
+        <div class="content-wrapper">
+            
+            <!-- CHART SECTION -->
+            <div class="dashboard-box">
+                <div class="box-header">
+                    <span>Holat diagrammasi</span>
+                </div>
+                <div style="position: relative; height: 300px;">
+                    <canvas id="myChart"></canvas>
+                </div>
+                <div style="text-align: center; margin-top: 20px; color: var(--text-light); font-size: 0.9rem;">
+                    Samaradorlik ko'rsatkichi: <b style="color: var(--primary);">{{ success_rate|default:0 }}%</b>
+                </div>
+            </div>
+
+            <!-- TABLE SECTION -->
+            <div class="dashboard-box">
+                <div class="box-header">
+                    <span>So'nggi faollik</span>
+                    <a href="#" style="font-size: 0.85rem; color: var(--primary); text-decoration: none;">Barchasini ko'rish</a>
+                </div>
+                
+                <div class="table-container">
+                    {% if recent_complaints %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Sarlavha</th>
+                                <th>Sana</th>
+                                <th>Holat</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in recent_complaints %}
+                            <tr>
+                                <td style="font-weight: 600; color: var(--text-main);">
+                                    {{ item.title|truncatechars:40 }}
+                                </td>
+                                <td style="color: var(--text-light);">
+                                    {{ item.created_at|date:"d.m.Y H:i" }}
+                                </td>
+                                <td>
+                                    {% if item.status == 'new' %}
+                                        <span class="badge badge-new">Yangi</span>
+                                    {% elif item.status == 'in_progress' %}
+                                        <span class="badge badge-progress">Jarayonda</span>
+                                    {% elif item.status == 'closed' %}
+                                        <span class="badge badge-closed">Yopilgan</span>
+                                    {% elif item.status == 'rejected' %}
+                                        <span class="badge badge-rejected">Rad etilgan</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                        <div style="text-align: center; padding: 40px; color: #999;">
+                            <i class="fas fa-clipboard-list" style="font-size: 3rem; margin-bottom: 15px; display: block; opacity: 0.5;"></i>
+                            Hozircha murojaatlar mavjud emas
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS SCRIPT -->
+    <script>
+        // Xavfsiz ma'lumot olish (Error prevention)
+        const closedVal = parseInt("{{ closed_count|default:0 }}");
+        const progressVal = parseInt("{{ in_progress_count|default:0 }}");
+        const rejectedVal = parseInt("{{ rejected_count|default:0 }}");
+
+        document.addEventListener("DOMContentLoaded", function() {
+            if (typeof Chart !== 'undefined') {
+                const ctx = document.getElementById('myChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Yopilgan', 'Jarayonda', 'Rad etilgan'],
+                        datasets: [{
+                            data: [closedVal, progressVal, rejectedVal],
+                            backgroundColor: [
+                                '#2e7d32', // To'q yashil
+                                '#fbc02d', // Sariq
+                                '#c62828'  // Qizil
+                            ],
+                            borderWidth: 0,
+                            hoverOffset: 10
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 20,
+                                    usePointStyle: true,
+                                    font: { family: 'Nunito', size: 13 }
+                                }
+                            }
+                        },
+                        cutout: '70%'
+                    }
+                });
+            } else {
+                console.error("Chart.js yuklanmadi!");
+            }
+        });     
+    </script>
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kirish — EkoMurojaat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2e7d32;       /* Asosiy to'q yashil */
+            --accent: #00e676;        /* Yorqin yashil */
+            --bg-gradient: linear-gradient(135deg, #134e5e 0%, #71b280 100%);
+            --glass: rgba(255, 255, 255, 0.92);
+            --text-main: #2c3e50;
+            --input-bg: #f8fafc;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--bg-gradient);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden; /* Skrollni o'chirish */
+            position: relative;
+        }
+
+        /* Orqa fondagi bezaklar */
+        .leaf-bg {
+            position: absolute;
+            font-size: 12rem;
+            opacity: 0.05;
+            color: white;
+            z-index: 0;
+            pointer-events: none;
+            user-select: none;
+        }
+        .leaf-1 { top: -20px; left: -20px; transform: rotate(-45deg); }
+        .leaf-2 { bottom: -20px; right: -20px; transform: rotate(10deg); }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px; /* Login kartasi ixcham bo'ladi */
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            text-align: center;
+            border-top: 4px solid var(--accent);
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-card h2 {
+            margin-bottom: 30px;
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .login-card h2::before {
+            content: '♻️';
+            font-size: 1.5rem;
+        }
+
+        form {
+            text-align: left;
+        }
+
+        /* LABEL DIZAYNI */
+        label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            margin-top: 20px;
+            margin-left: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        label::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            margin-right: 8px;
+            display: inline-block;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            background: var(--input-bg);
+            outline: none;
+            font-size: 1rem;
+            color: var(--text-main);
+            transition: all 0.3s ease;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: var(--primary);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(46, 125, 50, 0.1);
+        }
+
+        /* Parolni ko'rsatish ko'zi */
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 1.2rem;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .toggle-password:hover {
+            opacity: 1;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 15px;
+            margin-top: 30px;
+            background: linear-gradient(to right, var(--primary), #1b5e20);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 20px rgba(46, 125, 50, 0.25);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px rgba(46, 125, 50, 0.35);
+        }
+
+        button[type="submit"]:active {
+            transform: translateY(0);
+        }
+
+        .signup-link {
+            margin-top: 25px;
+            display: inline-block;
+            font-size: 0.9rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 5px 10px;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        .signup-link:hover {
+            background: rgba(46, 125, 50, 0.1);
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Orqa fon bezagi -->
+    <div class="leaf-bg leaf-1">🌿</div>
+    <div class="leaf-bg leaf-2">🍃</div>
+
+    <div class="container">
+        <div class="login-card">
+            <h2>EkoMurojaat</h2>
+
+            <form method="post">
+                {% csrf_token %}
+                
+                <!-- Login Input -->
+                <label for="username">Foydalanuvchi nomi</label>
+                <div class="input-group">
+                    <input type="text" id="username" name="username" placeholder="Loginni kiriting" required>
+                </div>
+
+                <!-- Password Input -->
+                <label for="password">Parol</label>
+                <div class="input-group">
+                    <input type="password" id="password" name="password" placeholder="********" required>
+                    <span class="toggle-password" onclick="togglePassword(this)" title="Parolni ko'rsatish">👁️</span>
+                </div>
+
+                <button type="submit">Tizimga kirish</button>
+            </form>
+
+            <a class="signup-link" href="/signup/">Ro‘yxatdan o‘tish →</a>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword(element) {
+            // Span'ning oldidagi inputni topamiz
+            let input = element.previousElementSibling;
+
+            if (input.type === "password") {
+                input.type = "text";
+                element.textContent = "🙈"; // Ko'z yumilgan
+            } else {
+                input.type = "password";
+                element.textContent = "👁️"; // Ko'z ochiq
+            }
+        }
+    </script>
+</body>
+</html>

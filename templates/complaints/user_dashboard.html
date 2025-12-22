@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - EkoMurojat{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-7xl">
+    
+    <!-- Page Header -->
+    <div class="flex flex-col md:flex-row justify-between items-end mb-10 gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-800 tracking-tight">Mening Dashboardim</h1>
+            <p class="text-slate-500 mt-2 font-medium">Xush kelibsiz, <span class="text-emerald-600">{{ user.username }}</span>! 👋</p>
+        </div>
+        <a href="{% url 'user_complaint_create' %}" class="btn-primary shadow-lg shadow-emerald-200">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            Yangi murojaat
+        </a>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-12">
+        
+        <!-- Jami -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 group">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Jami</p>
+                    <h3 class="text-3xl font-bold text-slate-800">{{ total_count }}</h3>
+                </div>
+                <div class="p-3 bg-blue-50 text-blue-600 rounded-xl group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hal etilgan -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 group">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Hal etilgan</p>
+                    <h3 class="text-3xl font-bold text-emerald-600">{{ closed_count }}</h3>
+                </div>
+                <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Jarayonda -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 group">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Jarayonda</p>
+                    <h3 class="text-3xl font-bold text-orange-500">{{ in_progress_count }}</h3>
+                </div>
+                <div class="p-3 bg-orange-50 text-orange-500 rounded-xl group-hover:bg-orange-500 group-hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rad etilgan -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 group">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Rad etilgan</p>
+                    <h3 class="text-3xl font-bold text-red-500">{{ rejected_count }}</h3>
+                </div>
+                <div class="p-3 bg-red-50 text-red-500 rounded-xl group-hover:bg-red-500 group-hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Muvaffaqiyat (Gradient Card) -->
+        <div class="bg-gradient-to-br from-emerald-500 to-green-600 p-6 rounded-2xl shadow-lg hover:shadow-emerald-200 hover:-translate-y-1 transition-all duration-300 text-white">
+            <div class="flex justify-between items-start">
+                <div>
+                    <p class="text-xs font-bold text-emerald-100 uppercase tracking-wider mb-1">Samaradorlik</p>
+                    <h3 class="text-3xl font-bold">{{ success_rate }}%</h3>
+                </div>
+                <div class="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Complaints Section -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        
+        <!-- Header -->
+        <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Oxirgi murojaatlar
+            </h2>
+            <a href="{% url 'user_complaints' %}" class="text-sm font-semibold text-emerald-600 hover:text-emerald-700 hover:underline flex items-center gap-1">
+                Barchasini ko'rish 
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+            </a>
+        </div>
+
+        <!-- Content -->
+        {% if recent_complaints %}
+            <div class="divide-y divide-slate-100">
+                {% for complaint in recent_complaints %}
+                <div class="p-6 hover:bg-slate-50 transition-colors duration-150 group">
+                    <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                        
+                        <!-- Main Info -->
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-2">
+                                <a href="{% url 'user_complaint_detail' complaint.pk %}" class="text-lg font-bold text-slate-800 group-hover:text-emerald-600 transition-colors">
+                                    {{ complaint.title }}
+                                </a>
+                                <!-- Status Badge -->
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide border
+                                    {% if complaint.status == 'new' %} bg-blue-50 text-blue-600 border-blue-100
+                                    {% elif complaint.status == 'in_progress' %} bg-orange-50 text-orange-600 border-orange-100
+                                    {% elif complaint.status == 'closed' %} bg-green-50 text-green-600 border-green-100
+                                    {% elif complaint.status == 'rejected' %} bg-red-50 text-red-600 border-red-100 {% endif %}">
+                                    {{ complaint.get_status_display }}
+                                </span>
+                            </div>
+                            <p class="text-slate-500 text-sm line-clamp-2 mb-3">
+                                {{ complaint.description }}
+                            </p>
+                            
+                            <!-- Meta Data -->
+                            <div class="flex flex-wrap items-center gap-4 text-xs font-medium text-slate-400">
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                    {{ complaint.region.name }}, {{ complaint.district.name }}
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    {{ complaint.created_at|date:"d.m.Y" }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Priority Badge (Right Side) -->
+                        <div class="flex-shrink-0">
+                            <span class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border
+                                {% if complaint.priority == 'high' %} bg-red-50 text-red-600 border-red-100
+                                {% elif complaint.priority == 'medium' %} bg-yellow-50 text-yellow-600 border-yellow-100
+                                {% else %} bg-slate-50 text-slate-600 border-slate-100 {% endif %}">
+                                <span class="w-2 h-2 rounded-full
+                                    {% if complaint.priority == 'high' %} bg-red-500
+                                    {% elif complaint.priority == 'medium' %} bg-yellow-500
+                                    {% else %} bg-slate-400 {% endif %}"></span>
+                                {{ complaint.get_priority_display }}
+                            </span>
+                        </div>
+
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- Empty State -->
+            <div class="flex flex-col items-center justify-center py-16 px-4 text-center">
+                <div class="bg-slate-50 p-4 rounded-full mb-4">
+                    <svg class="w-12 h-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800 mb-1">Murojaatlar mavjud emas</h3>
+                <p class="text-slate-500 mb-6 max-w-sm">Hozircha sizda hech qanday murojaat yo'q. Atrof-muhit muammolarini hal qilishda birinchi qadamni tashlang!</p>
+                <a href="{% url 'user_complaint_create' %}" class="btn-primary">
+                    Murojaat qoldirish
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

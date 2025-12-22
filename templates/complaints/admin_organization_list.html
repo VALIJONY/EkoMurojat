@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}Tashkilotlar - Admin{% endblock %}
+
+{% block extra_head %}
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-7xl">
+    
+    <!-- Page Header -->
+    <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-3">
+                <i class="ri-building-4-line text-emerald-600"></i>
+                Tashkilotlar
+            </h1>
+            <p class="text-slate-500 mt-1 ml-1">Tizimdagi barcha mas'ul tashkilotlar ro'yxati</p>
+        </div>
+        
+        <a href="{% url 'organization_create_admin' %}" class="px-6 py-2.5 bg-emerald-600 text-white font-bold rounded-xl shadow-lg shadow-emerald-200 hover:bg-emerald-700 hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center gap-2">
+            <i class="ri-add-line text-xl"></i> Yangi tashkilot
+        </a>
+    </div>
+
+    {% if organizations %}
+        <!-- Table Container -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <!-- Table Head -->
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-100">
+                            <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Tashkilot</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Hudud / Manzil</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Aloqa ma'lumotlari</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Amallar</th>
+                        </tr>
+                    </thead>
+                    
+                    <!-- Table Body -->
+                    <tbody class="divide-y divide-slate-100">
+                        {% for org in organizations %}
+                        <tr class="hover:bg-slate-50/80 transition-colors group">
+                            
+                            <!-- Name & Logo -->
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-4">
+                                    <!-- Dynamic Avatar based on ID (random color logic visual) -->
+                                    <div class="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center text-xl font-bold
+                                        {% cycle 'bg-blue-100 text-blue-600' 'bg-purple-100 text-purple-600' 'bg-amber-100 text-amber-600' 'bg-emerald-100 text-emerald-600' %}">
+                                        {{ org.name|slice:":1"|upper }}
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-slate-800 text-base">{{ org.name }}</div>
+                                        <div class="text-xs text-slate-400 font-mono">ID: #{{ org.id }}</div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Location -->
+                            <td class="px-6 py-4">
+                                <div class="flex flex-col gap-1">
+                                    <span class="inline-flex w-fit items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                                        <i class="ri-map-pin-user-line"></i> {{ org.hudud.name }}
+                                    </span>
+                                    <span class="text-sm text-slate-500 line-clamp-1" title="{{ org.manzil }}">
+                                        {{ org.manzil }}
+                                    </span>
+                                </div>
+                            </td>
+
+                            <!-- Contacts -->
+                            <td class="px-6 py-4">
+                                <div class="space-y-1.5">
+                                    <div class="flex items-center gap-2 text-sm text-slate-600">
+                                        <i class="ri-phone-line text-emerald-500"></i>
+                                        <span class="font-mono">{{ org.telefon }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 text-sm text-slate-600">
+                                        <i class="ri-mail-line text-blue-500"></i>
+                                        <span>{{ org.email }}</span>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Actions -->
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <a href="{% url 'organization_update_admin' org.pk %}" class="w-9 h-9 flex items-center justify-center rounded-lg text-slate-400 hover:text-amber-500 hover:bg-amber-50 transition-all border border-transparent hover:border-amber-200" title="Tahrirlash">
+                                        <i class="ri-edit-line text-lg"></i>
+                                    </a>
+                                    <a href="{% url 'organization_delete_admin' org.pk %}" class="w-9 h-9 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all border border-transparent hover:border-red-200" title="O'chirish">
+                                        <i class="ri-delete-bin-line text-lg"></i>
+                                    </a>
+                                </div>
+                            </td>
+
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="flex justify-center mt-8">
+            <nav class="inline-flex rounded-xl shadow-sm bg-white border border-slate-200 p-1 space-x-1">
+                {% if page_obj.has_previous %}
+                    <a href="?page=1" class="px-3 py-2 rounded-lg text-slate-500 hover:bg-slate-50 hover:text-emerald-600 transition-colors">
+                        <i class="ri-arrow-left-double-line"></i>
+                    </a>
+                    <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-2 rounded-lg text-slate-500 hover:bg-slate-50 hover:text-emerald-600 transition-colors">
+                        <i class="ri-arrow-left-s-line"></i>
+                    </a>
+                {% endif %}
+
+                <span class="px-4 py-2 rounded-lg bg-emerald-600 text-white font-medium shadow-md">
+                    {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-2 rounded-lg text-slate-500 hover:bg-slate-50 hover:text-emerald-600 transition-colors">
+                        <i class="ri-arrow-right-s-line"></i>
+                    </a>
+                    <a href="?page={{ page_obj.paginator.num_pages }}" class="px-3 py-2 rounded-lg text-slate-500 hover:bg-slate-50 hover:text-emerald-600 transition-colors">
+                        <i class="ri-arrow-right-double-line"></i>
+                    </a>
+                {% endif %}
+            </nav>
+        </div>
+        {% endif %}
+
+    {% else %}
+        <!-- Empty State -->
+        <div class="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border border-dashed border-slate-300 text-center">
+            <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-6 text-slate-400 text-4xl shadow-inner">
+                <i class="ri-building-2-line"></i>
+            </div>
+            <h2 class="text-xl font-bold text-slate-800 mb-2">Tashkilotlar topilmadi</h2>
+            <p class="text-slate-500 max-w-sm mb-8">Tizimda ishlashni boshlash uchun birinchi tashkilotni qo'shing.</p>
+            <a href="{% url 'organization_create_admin' %}" class="px-8 py-3 bg-emerald-600 text-white font-bold rounded-xl shadow-lg shadow-emerald-200 hover:bg-emerald-700 hover:-translate-y-0.5 transition-all flex items-center gap-2">
+                <i class="ri-add-circle-line text-xl"></i> Tashkilot qo'shish
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

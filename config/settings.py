@@ -11,10 +11,10 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from environs import Env
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
+env = Env()
+env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,24 +24,27 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = env.str("SECRET_KEY", default="django-insecure-8^_!9x7y$%^&*_+qwertyuiopasdfghjklzxcvbnm,-")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG")
+DEBUG = env.bool("DEBUG", default=True)
 
-ALLOWED_HOSTS = [os.getenv("ALLOWED_HOSTS")]
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["*"])
 
+# Custom user model
+AUTH_USER_MODEL = 'users.CustomUser'
 
 # Application definition
 
 INSTALLED_APPS = [
+    'unfold',
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # 'django.contrib.gis',
+    'django.contrib.gis',
     "users",
     "complaints",
     "common",
@@ -84,11 +87,11 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "NAME": os.getenv("DB_NAME"),
-        "USER": os.getenv("DB_USER"),
-        "PASSWORD": os.getenv("DB_PASSWORD"),
-        "HOST": os.getenv("DB_HOST"),
-        "PORT": os.getenv("DB_PORT"),
+        "NAME": env.str("DB_NAME"),
+        "USER": env.str("DB_USER"),
+        "PASSWORD": env.str("DB_PASSWORD"),
+        "HOST": env.str("DB_HOST"),
+        "PORT": env.str("DB_PORT"),
     }
 }
 
@@ -124,6 +127,22 @@ USE_I18N = True
 USE_TZ = True
 
 
+
+# Emailga sms yuborish uchun sozlamalar
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'rustambekovanafosat69@gmail.com'
+EMAIL_HOST_PASSWORD = 'kdkl hfgo hgwq otrf'
+
+# EMAIL_HOST_USER = 'f12kitchen@gmail.com'
+# EMAIL_HOST_PASSWORD = 'ppycfqnytqxlqual'
+
+
+LOGIN_REDIRECT_URL = '/login'
+LOGOUT_REDIRECT_URL = '/logout'
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
@@ -140,3 +159,120 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Django Unfold Configuration
+UNFOLD = {
+    "SITE_TITLE": "EkoMurojat Admin",
+    "SITE_HEADER": "EkoMurojat Boshqaruv Paneli",
+    "SITE_URL": "/",
+    "SITE_ICON": {
+        "light": lambda request: "🌿",
+        "dark": lambda request: "🌿",
+    },
+    "SITE_LOGO": None,
+    "SITE_SYMBOL": "🌿",
+    "SHOW_HISTORY": True,
+    "SHOW_VIEW_ON_SITE": True,
+    "ENVIRONMENT": "config.settings.environment_callback",
+    "DASHBOARD_CALLBACK": "config.settings.dashboard_callback",
+    "COLORS": {
+        "primary": {
+            "50": "239 246 255",
+            "100": "219 234 254",
+            "200": "191 219 254",
+            "300": "147 197 253",
+            "400": "96 165 250",
+            "500": "59 130 246",
+            "600": "16 185 129",
+            "700": "5 150 105",
+            "800": "4 120 87",
+            "900": "6 78 59",
+            "950": "2 44 34",
+        },
+    },
+    "EXTENSIONS": {
+        "modeltranslation": {
+            "flags": {
+                "en": "🇬🇧",
+                "uz": "🇺🇿",
+                "ru": "🇷🇺",
+            },
+        },
+    },
+    "SIDEBAR": {
+        "show_search": True,
+        "show_all_applications": True,
+        "navigation": [
+            {
+                "title": "Asosiy",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Dashboard",
+                        "icon": "dashboard",
+                        "link": "/admin/",
+                    },
+                ],
+            },
+            {
+                "title": "Foydalanuvchilar",
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": "Foydalanuvchilar",
+                        "icon": "person",
+                        "link": lambda request: "/admin/users/customuser/",
+                    },
+                ],
+            },
+            {
+                "title": "Murojaatlar",
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": "Murojaatlar",
+                        "icon": "mail",
+                        "link": lambda request: "/admin/complaints/complaint/",
+                    },
+                    {
+                        "title": "Rasmlar",
+                        "icon": "image",
+                        "link": lambda request: "/admin/complaints/image/",
+                    },
+                ],
+            },
+            {
+                "title": "Umumiy",
+                "separator": True,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": "Viloyatlar",
+                        "icon": "location_on",
+                        "link": lambda request: "/admin/common/region/",
+                    },
+                    {
+                        "title": "Tumanlar",
+                        "icon": "place",
+                        "link": lambda request: "/admin/common/district/",
+                    },
+                    {
+                        "title": "Tashkilotlar",
+                        "icon": "business",
+                        "link": lambda request: "/admin/common/tashkilot/",
+                    },
+                ],
+            },
+        ],
+    },
+}
+
+def environment_callback(request):
+    """Environment badge for admin"""
+    return ["Development", "warning"] if DEBUG else ["Production", "danger"]
+
+def dashboard_callback(request, context):
+    """Custom dashboard data"""
+    return context
