@@ -125,7 +125,7 @@ Admin murojaatga **muhimlik** (past / oʻrta / yuqori) va **mas’ul tashkilot**
 | **django-unfold** | Zamonaviy admin panel |
 | **environs** | `.env` orqali sozlamalar |
 | **Pillow** | Murojaat va profil rasmlari |
-| Django `send_mail` (SMTP) | Roʻyxatdan oʻtishni tasdiqlash kodi |
+| Django `send_mail` (SMTP) | Roʻyxatdan oʻtishni tasdiqlash kodi (`secrets` bilan generatsiya) |
 
 ## Maʼlumotlar modeli
 
@@ -187,12 +187,12 @@ Sayt: <http://127.0.0.1:8000> · Django admin: <http://127.0.0.1:8000/admin/>
 
 > ⚠️ **Muhim:** `createsuperuser` yaratgan foydalanuvchining `role` maydoni `user` boʻladi. Administrator paneliga kirish uchun Django adminda (`/admin/`) uning **roli**ni `admin` qilib qoʻying. Xuddi shu joyda tashkilot yaratib, moderatorlarni unga biriktirasiz. Viloyat va tumanlar ham admin orqali qoʻshiladi.
 
-**Roʻyxatdan oʻtish kodi.** Tasdiqlash kodi SMTP orqali yuboriladi (`config/settings.py` dagi `EMAIL_*`) — oʻzingizning pochta hisobingiz maʼlumotlarini kiriting. Dasturlashda kodni olish uchun `EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'` qilsangiz, u terminalga chiqadi.
+**Roʻyxatdan oʻtish kodi.** `.env` da `EMAIL_HOST_USER` va `EMAIL_HOST_PASSWORD` (Gmail uchun *ilova paroli*) berilsa, kod pochtaga yuboriladi. Berilmasa (dasturlash rejimi), kod **terminalga** chiqadi.
 
 `uv` oʻrniga `pip` ishlatmoqchi boʻlsangiz:
 
 ```bash
-pip install "django>=6.0" django-unfold environs pillow psycopg2-binary python-dotenv "GDAL==$(gdal-config --version)"
+pip install -r requirements.txt "GDAL==$(gdal-config --version)"
 ```
 
 ## Sozlamalar
@@ -206,6 +206,7 @@ pip install "django>=6.0" django-unfold environs pillow psycopg2-binary python-d
 | `ALLOWED_HOSTS` | `localhost,127.0.0.1` | Vergul bilan |
 | `DB_NAME` `DB_USER` `DB_PASSWORD` | `ekomurojat` `postgres` | PostgreSQL |
 | `DB_HOST` `DB_PORT` | `localhost` `5432` | |
+| `EMAIL_HOST_USER` `EMAIL_HOST_PASSWORD` | — | Ixtiyoriy: tasdiqlash kodini pochtaga yuborish (aks holda terminalga chiqadi) |
 
 Yuklangan rasmlar `media/` papkasida saqlanadi (gitga tushmaydi), `DEBUG` yoqilganda Django orqali beriladi.
 
@@ -226,8 +227,6 @@ EkoMurojat/
 
 ## Rivojlantirish rejasi
 
-- [ ] SMTP maʼlumotlarini `config/settings.py` dan muhit oʻzgaruvchilariga koʻchirish
-- [ ] Xarita plitkalari (tile) provayderini tekshirish — CARTO `rastertiles` manzili API kalit talab qilishi mumkin
 - [ ] REST API (murojaatlarni mobil ilova uchun ochish)
 - [ ] Murojaat holati oʻzgarganda fuqaroga bildirishnoma
 - [ ] Statistik hisobot eksporti (Excel/PDF)

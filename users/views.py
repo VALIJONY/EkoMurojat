@@ -11,7 +11,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from django.conf import settings
-import random
+import secrets
 
 # Create your views here.
 
@@ -28,7 +28,7 @@ class SignUp(generic.CreateView):
         user.is_active = False
         user.save()
 
-        code = str(random.randint(100000, 999999))
+        code = str(secrets.randbelow(900000) + 100000)
 
         subject = 'Tasdiqlash kodi - EkoMurojaat'
         message = f'Sizning tasdiqlash kodingiz: {code}'

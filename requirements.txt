@@ -1,4 +1,7 @@
-django
-psycopg2-binary
-Pillow
-environs
+# Tizim kutubxonalari (Ubuntu): gdal-bin libgdal-dev libgeos-dev
+# GDAL Python paketi tizimdagi libgdal versiyasiga mos bo'lishi kerak: pip install "GDAL==$(gdal-config --version)"
+django>=6.0
+django-unfold>=0.74
+environs>=14.5
+pillow>=12.0
+psycopg2-binary>=2.9

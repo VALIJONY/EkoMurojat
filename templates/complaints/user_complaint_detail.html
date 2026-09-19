@@ -132,8 +132,8 @@
                 {% if complaint.location %}
                     <div id="map" class="rounded-2xl border border-slate-200 shadow-md"></div>
                     <div class="mt-4 p-4 text-sm text-slate-700 bg-slate-50 rounded-xl">
-                        <p class="mb-1"><span class="font-semibold text-slate-800">Viloyat:</span> {{ complaint.region.name }}</p>
-                        <p><span class="font-semibold text-slate-800">Tuman:</span> {{ complaint.district.name }}</p>
+                        <p class="mb-1"><span class="font-semibold text-slate-800">Viloyat:</span> {{ complaint.region.name|force_escape|escapejs }}</p>
+                        <p><span class="font-semibold text-slate-800">Tuman:</span> {{ complaint.district.name|force_escape|escapejs }}</p>
                     </div>
                 {% else %}
                     <div class="h-40 flex items-center justify-center bg-slate-50 text-slate-400 text-base font-medium rounded-2xl border border-dashed border-slate-200">
@@ -191,8 +191,8 @@
         var map = L.map('map', { zoomControl: false }).setView([lat, lon], 14);
         
         // Kartaning yangi stili (CartoDB Voyager)
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap &copy; CARTO',
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors',
             maxZoom: 20
         }).addTo(map);
 
@@ -205,7 +205,7 @@
         });
 
         L.marker([lat, lon], {icon: customIcon}).addTo(map)
-            .bindPopup("<b>Murojaat joylashuvi</b><br>{{ complaint.district.name }}")
+            .bindPopup("<b>Murojaat joylashuvi</b><br>{{ complaint.district.name|force_escape|escapejs }}")
             .openPopup();
         
         // Zoom Controlsni o'ng pastga qo'shish
