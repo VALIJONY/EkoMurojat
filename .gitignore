@@ -1,51 +1,45 @@
-# Python
+# ── Python ────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
 *.egg-info/
-.installed.cfg
-*.egg
+build/
+dist/
+wheels/
 
-# Django
+# ── Virtual muhit ─────────────────────────────────────────
+.venv/
+venv/
+env/
+
+# ── Maxfiy sozlamalar (faqat .env.example gitga tushadi) ──
+.env
+.env.*
+!.env.example
+
+# ── Django ────────────────────────────────────────────────
 *.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-media/
-staticfiles/
+# foydalanuvchi yuklagan rasmlar va collectstatic natijasi
+/media/
+/staticfiles/
 
-# Environment variables
-.env
+# ── Test va lint keshlari ─────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+.ruff_cache/
+.mypy_cache/
 
-# IDE
+# ── Muharrir va OT ────────────────────────────────────────
 .idea/
 .vscode/
 *.swp
 *.swo
-
-# OS generated files
 .DS_Store
-.DS_Store?
 ._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
-
-
-# virtual environment
-.venv
+ehthumbs.db
+.claude/
